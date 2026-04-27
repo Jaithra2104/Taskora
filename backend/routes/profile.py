@@ -1,10 +1,16 @@
+import os
+import logging
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from werkzeug.utils import secure_filename
 from models import get_db
-import logging
+from config import Config
 
 profile_bp = Blueprint('profile', __name__)
 logger = logging.getLogger(__name__)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 @profile_bp.route('/', methods=['GET'])
 @jwt_required()
@@ -22,6 +28,28 @@ def get_profile():
     finally:
         db.close()
 
+@profile_bp.route('/upload', methods=['POST'])
+@jwt_required()
+def upload_profile_pic():
+    user_id = get_jwt_identity()
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file and allowed_file(file.filename):
+        user_dir = os.path.join(Config.UPLOAD_FOLDER, str(user_id), 'profile')
+        os.makedirs(user_dir, exist_ok=True)
+        filename = secure_filename(file.filename)
+        import time
+        unique_filename = f"avatar_{int(time.time())}_{filename}"
+        save_path = os.path.join(user_dir, unique_filename)
+        file.save(save_path)
+        
+        file_url = f"/uploads/{user_id}/profile/{unique_filename}"
+        return jsonify({'file_url': file_url}), 200
+    return jsonify({'error': 'File type not allowed'}), 400
+
 @profile_bp.route('/', methods=['POST'])
 @jwt_required()
 def update_profile():
@@ -32,7 +60,11 @@ def update_profile():
         # Update user name as well if first/last name changed
         name = data.get('name')
         if not name:
-            name = f"{data.get('first_name', '')} {data.get('last_name', '')}".strip()
+            fn = data.get('first_name', '') or ''
+            ln = data.get('last_name', '') or ''
+            name = f"{fn} {ln}".strip()
+        if not name:
+            name = "User"
 
         db.execute(
             "UPDATE users SET name = ?, first_name = ?, last_name = ?, mobile_no = ?, linkedin = ?, github = ?, profile_pic = ?, bio = ? WHERE id = ?",
