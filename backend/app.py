@@ -156,6 +156,11 @@ def home():
     return "🚀 Taskora Backend is Live!"
 
 
+@app.route('/test')
+def test():
+    return "TEST WORKING"
+
+
 # Initialize DB and Scheduler on startup
 try:
     with app.app_context():
