@@ -153,7 +153,7 @@ def health():
 
 @app.route('/')
 def home():
-    return "Taskora Backend is Running 🚀"
+    return "🚀 Taskora Backend is Live!"
 
 
 # Initialize DB and Scheduler on startup
