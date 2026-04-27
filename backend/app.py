@@ -18,11 +18,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Initialize extensions
-import re
-CORS(app, origins=[
-    re.compile(r"^https://taskora.*\.vercel\.app$"),
-    "http://localhost:5173"
-])
+CORS(app, origins="*")
 jwt = JWTManager(app)
 
 # Register blueprints
