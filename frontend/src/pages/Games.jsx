@@ -6,100 +6,48 @@ const GAMES = [
   { id: 'crossword', name: 'LexiCross', icon: 'fa-font', color: 'var(--emerald)', desc: 'Boost your vocabulary with daily word grids.' }
 ]
 
-// Audio Utility using Web Audio API (Zero dependencies)
 const playSound = (type) => {
     const ctx = new (window.AudioContext || window.webkitAudioContext)()
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
-    
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-
+    osc.connect(gain); gain.connect(ctx.destination)
     if (type === 'click') {
-        osc.type = 'sine'
-        osc.frequency.setValueAtTime(440, ctx.currentTime)
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1)
-        gain.gain.setValueAtTime(0.1, ctx.currentTime)
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
-        osc.start()
-        osc.stop(ctx.currentTime + 0.1)
+        osc.type = 'sine'; osc.frequency.setValueAtTime(440, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1)
+        gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); osc.start(); osc.stop(ctx.currentTime + 0.1)
     } else if (type === 'error') {
-        osc.type = 'sawtooth'
-        osc.frequency.setValueAtTime(110, ctx.currentTime)
-        gain.gain.setValueAtTime(0.1, ctx.currentTime)
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-        osc.start()
-        osc.stop(ctx.currentTime + 0.3)
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(110, ctx.currentTime); gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+        osc.start(); osc.stop(ctx.currentTime + 0.3)
     } else if (type === 'win') {
-        const frequencies = [523.25, 659.25, 783.99, 1046.50] // C major chord
-        frequencies.forEach((f, i) => {
-            const o = ctx.createOscillator()
-            const g = ctx.createGain()
-            o.type = 'sine'
-            o.frequency.setValueAtTime(f, ctx.currentTime + i * 0.1)
-            g.connect(ctx.destination)
-            o.connect(g)
-            g.gain.setValueAtTime(0.1, ctx.currentTime + i * 0.1)
-            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.5)
-            o.start(ctx.currentTime + i * 0.1)
-            o.stop(ctx.currentTime + i * 0.1 + 0.5)
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f, ctx.currentTime + i * 0.1)
+            g.connect(ctx.destination); o.connect(g); g.gain.setValueAtTime(0.1, ctx.currentTime + i * 0.1); g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.5)
+            o.start(ctx.currentTime + i * 0.1); o.stop(ctx.currentTime + i * 0.1 + 0.5)
         })
     }
 }
 
 export default function Games() {
   const [activeGame, setActiveGame] = useState(null)
-
   return (
     <div className="fade-in">
-      <div className="page-header">
-        <div>
-          <h2>Mind Relief Hub</h2>
-          <p>Take a break, sharpen your mind, and recharge your focus.</p>
-        </div>
-      </div>
-
+      <div className="page-header"><div><h2>Mind Relief Hub</h2><p>Take a break, sharpen your mind, and recharge your focus.</p></div></div>
       {!activeGame ? (
         <div className="grid-3" style={{ marginTop: 20 }}>
           {GAMES.map(game => (
-            <div 
-              key={game.id} 
-              className="card hover-glow" 
-              onClick={() => setActiveGame(game.id)}
-              style={{ cursor: 'pointer', textAlign: 'center', border: `1px solid ${game.color}33`, padding: '40px 20px' }}
-            >
-              <div style={{ 
-                width: 90, height: 90, borderRadius: '24px', background: `${game.color}11`, 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 25px',
-                fontSize: '2.8rem', color: game.color, border: `2px solid ${game.color}44`,
-                boxShadow: `0 0 30px ${game.color}22`,
-                transform: 'rotate(-5deg)'
-              }}>
-                <i className={`fas ${game.icon}`}></i>
-              </div>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: 12, fontWeight: 900 }}>{game.name}</h3>
-              <p style={{ color: 'var(--text2)', fontSize: '.95rem', lineHeight: 1.5, marginBottom: 25 }}>{game.desc}</p>
-              <button className="btn" style={{ width: '100%', background: 'var(--glass)', border: `1px solid ${game.color}66`, color: game.color, fontWeight: 800 }}>
-                LAUNCH GAME
-              </button>
+            <div key={game.id} className="card hover-glow" onClick={() => setActiveGame(game.id)} style={{ cursor: 'pointer', textAlign: 'center', border: `1px solid ${game.color}33`, padding: '40px 20px' }}>
+              <div style={{ width: 90, height: 90, borderRadius: '24px', background: `${game.color}11`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 25px', fontSize: '2.8rem', color: game.color, border: `2px solid ${game.color}44`, boxShadow: `0 0 30px ${game.color}22`, transform: 'rotate(-5deg)' }}><i className={`fas ${game.icon}`}></i></div>
+              <h3 style={{ fontSize: '1.5rem', marginBottom: 12, fontWeight: 900 }}>{game.name}</h3><p style={{ color: 'var(--text2)', fontSize: '.95rem', lineHeight: 1.5, marginBottom: 25 }}>{game.desc}</p>
+              <button className="btn" style={{ width: '100%', background: 'var(--glass)', border: `1px solid ${game.color}66`, color: game.color, fontWeight: 800 }}>LAUNCH GAME</button>
             </div>
           ))}
         </div>
       ) : (
         <div className="card arcade-container" style={{ minHeight: '750px', display: 'flex', flexDirection: 'column', padding: '0', overflow: 'hidden', border: `1px solid ${GAMES.find(g => g.id === activeGame).color}33` }}>
           <div style={{ padding: '25px 35px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
-            <button onClick={() => setActiveGame(null)} className="btn hover-scale" style={{ background: 'var(--bg2)', padding: '10px 20px', borderRadius: 12 }}>
-              <i className="fas fa-chevron-left" style={{marginRight: 10}}></i> EXIT HUB
-            </button>
-            <div style={{ textAlign: 'center' }}>
-                <h2 style={{ color: GAMES.find(g => g.id === activeGame).color, fontSize: '1.8rem', fontWeight: 900, textShadow: `0 0 25px ${GAMES.find(g => g.id === activeGame).color}66`, margin: 0 }}>
-                    {GAMES.find(g => g.id === activeGame).name.toUpperCase()}
-                </h2>
-                <div style={{ width: 40, height: 4, background: GAMES.find(g => g.id === activeGame).color, margin: '8px auto 0', borderRadius: 10 }}></div>
-            </div>
+            <button onClick={() => setActiveGame(null)} className="btn hover-scale" style={{ background: 'var(--bg2)', padding: '10px 20px', borderRadius: 12 }}><i className="fas fa-chevron-left" style={{marginRight: 10}}></i> EXIT HUB</button>
+            <div style={{ textAlign: 'center' }}><h2 style={{ color: GAMES.find(g => g.id === activeGame).color, fontSize: '1.8rem', fontWeight: 900, textShadow: `0 0 25px ${GAMES.find(g => g.id === activeGame).color}66`, margin: 0 }}>{GAMES.find(g => g.id === activeGame).name.toUpperCase()}</h2><div style={{ width: 40, height: 4, background: GAMES.find(g => g.id === activeGame).color, margin: '8px auto 0', borderRadius: 10 }}></div></div>
             <div style={{ width: 140 }}></div>
           </div>
-          
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f', position: 'relative', overflow: 'hidden' }}>
              <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '120%', background: `radial-gradient(circle at 50% 50%, ${GAMES.find(g => g.id === activeGame).color}08 0%, transparent 70%)`, pointerEvents: 'none' }}></div>
             {activeGame === 'sudoku' && <Sudoku6x6 />}
@@ -121,39 +69,38 @@ function Sudoku6x6() {
   const [win, setWin] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [highScores, setHighScores] = useState(() => {
-    const saved = localStorage.getItem('taskora_sudoku_scores')
-    return saved ? JSON.parse(saved) : { easy: null, medium: null, hard: null }
+    const saved = localStorage.getItem('taskora_sudoku_scores'); return saved ? JSON.parse(saved) : { easy: null, medium: null, hard: null }
   })
   const timerRef = useRef(null)
 
-  const formatTime = (s) => {
-    if (s === null) return '--:--'
-    const mins = Math.floor(s / 60), secs = s % 60
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`
-  }
+  const formatTime = (s) => { if (s === null) return '--:--'; const mins = Math.floor(s / 60), secs = s % 60; return `${mins}:${secs < 10 ? '0' : ''}${secs}` }
 
   const generatePuzzle = (diff) => {
     let solved = [[1,2,3,4,5,6],[4,5,6,1,2,3],[2,3,1,5,6,4],[5,6,4,2,3,1],[3,1,2,6,4,5],[6,4,5,3,1,2]]
     for (let i = 0; i < 3; i++) if (Math.random() > 0.5) { const r1 = i*2, r2 = i*2+1; const temp = solved[r1]; solved[r1] = solved[r2]; solved[r2] = temp }
     for (let i = 0; i < 2; i++) if (Math.random() > 0.5) { const c1 = i*3, c2 = i*3 + (Math.floor(Math.random()*2)+1)%3; for(let r=0; r<6; r++) { const temp = solved[r][c1]; solved[r][c1] = solved[r][c2]; solved[r][c2] = temp } }
-    const cellsToRemove = diff === 'easy' ? 12 : (diff === 'medium' ? 18 : 24)
-    const newGrid = solved.map(row => [...row]), initCells = []
+    const cellsToRemove = diff === 'easy' ? 12 : (diff === 'medium' ? 18 : 24), newGrid = solved.map(row => [...row]), initCells = []
     let removed = 0; while (removed < cellsToRemove) { const r = Math.floor(Math.random()*6), c = Math.floor(Math.random()*6); if (newGrid[r][c] !== 0) { newGrid[r][c] = 0; removed++ } }
     for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] !== 0) initCells.push(`${r}-${c}`)
     setGrid(newGrid); setInitial(initCells); setWin(false); setSelected([null, null]); setInvalidCells([]); setGlowingGroups({ rows: [], cols: [], boxes: [] }); setSeconds(0)
     if (timerRef.current) clearInterval(timerRef.current); timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000)
   }
 
+  // FIX: Separate puzzle generation from keyboard listener to stop blinking/resetting
   useEffect(() => {
     generatePuzzle(difficulty)
+    return () => clearInterval(timerRef.current)
+  }, [difficulty])
+
+  useEffect(() => {
     const handleKeyDown = (e) => {
-        if (win || !selected[0] === null) return
+        if (win || selected[0] === null) return
         if (e.key >= '1' && e.key <= '6') handleNumberClick(parseInt(e.key))
         if (e.key === 'Backspace' || e.key === '0') handleNumberClick(0)
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => { clearInterval(timerRef.current); window.removeEventListener('keydown', handleKeyDown) }
-  }, [difficulty, selected, win])
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selected, win])
 
   const validateGrid = (newGrid) => {
     const invalid = [], newGlow = { rows: [], cols: [], boxes: [] }
@@ -175,11 +122,7 @@ function Sudoku6x6() {
     }
     setInvalidCells([...new Set(invalid)]); setGlowingGroups(newGlow)
     setTimeout(() => setGlowingGroups({ rows: [], cols: [], boxes: [] }), 1200)
-    
-    // Play Sounds
     if (invalid.length > invalidCells.length) playSound('error')
-    else if (newGlow.rows.length + newGlow.cols.length + newGlow.boxes.length > (glowingGroups.rows.length + glowingGroups.cols.length + glowingGroups.boxes.length)) playSound('click')
-
     let filled = true; for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] === 0) filled = false
     if (filled && invalid.length === 0) {
       setWin(true); clearInterval(timerRef.current); playSound('win')
@@ -195,62 +138,32 @@ function Sudoku6x6() {
       setGrid(newGrid); validateGrid(newGrid); if (num !== 0 && !invalidCells.includes(`${selected[0]}-${selected[1]}`)) playSound('click')
     }
   }
-
   const isCellInGlowingGroup = (r, c) => glowingGroups.rows.includes(r) || glowingGroups.cols.includes(c) || glowingGroups.boxes.includes(Math.floor(r/2)*2+Math.floor(c/3))
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 25, padding: '30px', width: '100%', maxWidth: 800 }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, width: '100%', maxWidth: 500 }}>
           <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center' }}>
-            <div style={{fontSize: '.75rem', color: 'var(--text3)', fontWeight: 800, letterSpacing: 1, marginBottom: 5}}>TIMER</div>
-            <div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--cyan)', fontFamily: 'monospace'}}>{formatTime(seconds)}</div>
+            <div style={{fontSize: '.75rem', color: 'var(--text3)', fontWeight: 800, letterSpacing: 1, marginBottom: 5}}>TIMER</div><div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--cyan)', fontFamily: 'monospace'}}>{formatTime(seconds)}</div>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center' }}>
-            <div style={{fontSize: '.75rem', color: 'var(--text3)', fontWeight: 800, letterSpacing: 1, marginBottom: 5}}>{difficulty.toUpperCase()} BEST</div>
-            <div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--yellow)', fontFamily: 'monospace'}}>{formatTime(highScores[difficulty])}</div>
+            <div style={{fontSize: '.75rem', color: 'var(--text3)', fontWeight: 800, letterSpacing: 1, marginBottom: 5}}>{difficulty.toUpperCase()} BEST</div><div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--yellow)', fontFamily: 'monospace'}}>{formatTime(highScores[difficulty])}</div>
           </div>
       </div>
-
       <div style={{ display: 'flex', justifyContent: 'center', gap: 15, width: '100%', maxWidth: 500, background: 'var(--bg2)', padding: '15px', borderRadius: 25, border: '1px solid var(--border)' }}>
-         <div style={{ flex: 1 }}>
-            <select className="form-input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} style={{ background: 'transparent', border: 'none', fontWeight: 800, color: 'var(--cyan)', height: '40px' }}>
-              <option value="easy">EASY MODE</option><option value="medium">MEDIUM MODE</option><option value="hard">HARD MODE</option>
-            </select>
-         </div>
-         <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ height: 40, padding: '0 25px', borderRadius: 15 }}>
-            <i className="fas fa-rotate" style={{marginRight: 8}}></i> NEW GRID
-         </button>
+         <div style={{ flex: 1 }}><select className="form-input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} style={{ background: 'transparent', border: 'none', fontWeight: 800, color: 'var(--cyan)', height: '40px' }}><option value="easy">EASY MODE</option><option value="medium">MEDIUM MODE</option><option value="hard">HARD MODE</option></select></div>
+         <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ height: 40, padding: '0 25px', borderRadius: 15 }}><i className="fas fa-rotate" style={{marginRight: 8}}></i> NEW GRID</button>
       </div>
-
       <div style={{ position: 'relative' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 65px)', border: '6px solid #1a1a2e', borderRadius: 20, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', background: '#0f0f1a' }}>
           {grid.map((row, r) => row.map((cell, c) => {
             const isInitial = initial.includes(`${r}-${c}`), isSelected = selected[0] === r && selected[1] === c, isInvalid = invalidCells.includes(`${r}-${c}`), isGlowing = isCellInGlowingGroup(r, c)
-            return (
-              <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 65, height: 65, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isInitial ? 'default' : 'pointer', background: isInvalid ? 'rgba(239, 68, 68, 0.4)' : (isGlowing ? 'rgba(0, 243, 255, 0.4)' : (isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent')), fontSize: '1.8rem', fontWeight: 900, color: isInvalid ? '#ff4d4d' : (isInitial ? '#fff' : 'var(--cyan)'), borderRight: (c + 1) % 3 === 0 ? '4px solid #1a1a2e' : '1px solid #1e1e30', borderBottom: (r + 1) % 2 === 0 ? '4px solid #1a1a2e' : '1px solid #1e1e30', transition: 'all 0.3s', transform: isSelected || isGlowing ? 'scale(1.08)' : 'none', boxShadow: isGlowing ? '0 0 25px var(--cyan)' : 'none', zIndex: isSelected || isGlowing ? 2 : 1 }}>
-                {cell !== 0 ? cell : ''}
-              </div>
-            )
+            return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 65, height: 65, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isInitial ? 'default' : 'pointer', background: isInvalid ? 'rgba(239, 68, 68, 0.4)' : (isGlowing ? 'rgba(0, 243, 255, 0.4)' : (isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent')), fontSize: '1.8rem', fontWeight: 900, color: isInvalid ? '#ff4d4d' : (isInitial ? '#fff' : 'var(--cyan)'), borderRight: (c + 1) % 3 === 0 ? '4px solid #1a1a2e' : '1px solid #1e1e30', borderBottom: (r + 1) % 2 === 0 ? '4px solid #1a1a2e' : '1px solid #1e1e30', transition: 'all 0.3s', transform: isSelected || isGlowing ? 'scale(1.08)' : 'none', boxShadow: isGlowing ? '0 0 25px var(--cyan)' : 'none', zIndex: isSelected || isGlowing ? 2 : 1 }}>{cell !== 0 ? cell : ''}</div> )
           }))}
         </div>
-        {win && (
-          <div className="fade-in" style={{ position: 'absolute', inset: -20, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 30, zIndex: 10, border: '2px solid var(--cyan)', boxShadow: '0 0 60px var(--cyan-dim)' }}>
-            <div style={{ width: 100, height: 100, background: 'var(--grad-cyan)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 25, boxShadow: '0 0 40px var(--cyan)' }}><i className="fas fa-check" style={{fontSize: '3.5rem', color: '#000'}}></i></div>
-            <h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>LEVEL COMPLETE</h2>
-            <div style={{ display: 'flex', gap: 30, margin: '20px 0' }}>
-                <div style={{textAlign: 'center'}}><p style={{fontSize: '.8rem', color: 'var(--text3)'}}>TIME</p><h3 style={{fontSize: '1.8rem', color: 'var(--cyan)'}}>{formatTime(seconds)}</h3></div>
-                <div style={{textAlign: 'center'}}><p style={{fontSize: '.8rem', color: 'var(--text3)'}}>BEST</p><h3 style={{fontSize: '1.8rem', color: 'var(--yellow)'}}>{formatTime(highScores[difficulty])}</h3></div>
-            </div>
-            {seconds === highScores[difficulty] && <div className="pulse" style={{ color: 'var(--yellow)', fontWeight: 900, marginBottom: 25 }}>🏆 NEW RECORD SET! 🏆</div>}
-            <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ padding: '15px 40px', borderRadius: 20 }}>PLAY NEXT</button>
-          </div>
-        )}
+        {win && ( <div className="fade-in" style={{ position: 'absolute', inset: -20, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 30, zIndex: 10, border: '2px solid var(--cyan)', boxShadow: '0 0 60px var(--cyan-dim)' }}><div style={{ width: 100, height: 100, background: 'var(--grad-cyan)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 25, boxShadow: '0 0 40px var(--cyan)' }}><i className="fas fa-check" style={{fontSize: '3.5rem', color: '#000'}}></i></div><h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>LEVEL COMPLETE</h2><div style={{ display: 'flex', gap: 30, margin: '20px 0' }}><div style={{textAlign: 'center'}}><p style={{fontSize: '.8rem', color: 'var(--text3)'}}>TIME</p><h3 style={{fontSize: '1.8rem', color: 'var(--cyan)'}}>{formatTime(seconds)}</h3></div><div style={{textAlign: 'center'}}><p style={{fontSize: '.8rem', color: 'var(--text3)'}}>BEST</p><h3 style={{fontSize: '1.8rem', color: 'var(--yellow)'}}>{formatTime(highScores[difficulty])}</h3></div></div>{seconds === highScores[difficulty] && <div className="pulse" style={{ color: 'var(--yellow)', fontWeight: 900, marginBottom: 25 }}>🏆 NEW RECORD SET! 🏆</div>}<button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ padding: '15px 40px', borderRadius: 20 }}>PLAY NEXT</button></div> )}
       </div>
-
       <div style={{ display: 'flex', gap: 15, flexWrap: 'wrap', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: 30, border: '1px solid var(--border)' }}>
-        {[1,2,3,4,5,6].map(num => (
-          <button key={num} onClick={() => handleNumberClick(num)} className="btn hover-glow" style={{ width: 65, height: 65, borderRadius: 20, padding: 0, justifyContent: 'center', fontSize: '1.8rem', fontWeight: 900, background: 'var(--bg2)', border: '2px solid var(--cyan)', color: 'var(--cyan)' }}>{num}</button>
-        ))}
+        {[1,2,3,4,5,6].map(num => ( <button key={num} onClick={() => handleNumberClick(num)} className="btn hover-glow" style={{ width: 65, height: 65, borderRadius: 20, padding: 0, justifyContent: 'center', fontSize: '1.8rem', fontWeight: 900, background: 'var(--bg2)', border: '2px solid var(--cyan)', color: 'var(--cyan)' }}>{num}</button> ))}
         <button onClick={() => handleNumberClick(0)} className="btn" style={{ width: 100, height: 65, borderRadius: 20, border: '2px solid var(--red)', color: '#ff4d4d', background: 'rgba(239, 68, 68, 0.05)', fontWeight: 800 }}>ERASE</button>
       </div>
       <p style={{fontSize: '.8rem', color: 'var(--text3)', fontStyle: 'italic'}}>PC Tip: Use numbers 1-6 on your keyboard to play faster!</p>
@@ -286,5 +199,5 @@ function ChessGame() {
   const handleCellClick = (r, c) => { if (turn !== 'white' || gameOver) return; const piece = board[r][c]; if (selected) { if (validMoves.includes(`${r}-${c}`)) makeMove(selected[0], selected[1], r, c); else { setSelected(null); setValidMoves([]) } } else if (piece && isWhitePiece(piece)) { setSelected([r, c]); setValidMoves(getValidMoves(r, c, board)) } }
   const getPieceIcon = (piece, size = '1.8rem', colorOverride = null) => { if (!piece) return null; const color = colorOverride || (piece === piece.toUpperCase() ? '#fff' : '#8b5cf6'), type = piece.toLowerCase(); let icon = ''; switch(type) { case 'r': icon = 'fa-chess-rook'; break; case 'n': icon = 'fa-chess-knight'; break; case 'b': icon = 'fa-chess-bishop'; break; case 'q': icon = 'fa-chess-queen'; break; case 'k': icon = 'fa-chess-king'; break; case 'p': icon = 'fa-chess-pawn'; break }; return <i className={`fas ${icon}`} style={{ color, filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))', fontSize: size }}></i> }
   const CapturedArea = ({ pieces, title }) => ( <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 60, alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: 10, borderRadius: 12, border: '1px solid var(--border)' }}><div style={{ fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800 }}>{title}</div><div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 400, flexWrap: 'wrap' }}>{pieces.map((p, i) => <div key={i}>{getPieceIcon(p, '1.2rem')}</div>)}</div></div> )
-  return ( <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 30 }}><div style={{ display: 'flex', gap: 20, alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: 40, border: '1px solid var(--purple)' }}><div style={{ color: turn === 'white' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'white' ? '0 0 10px var(--purple)' : 'none' }}>PLAYER</div><div style={{ color: 'var(--text3)' }}>VS</div><div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI</div></div><div style={{ display: 'flex', gap: 30, alignItems: 'flex-start' }}><CapturedArea pieces={capturedWhite} title="LOST" /><div style={{ position: 'relative' }}><div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 60px)', border: '6px solid #1a1a2e', borderRadius: 15, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>{board.map((row, r) => row.map((piece, c) => { const isBlackCell = (r + c) % 2 === 1, isSelected = selected && selected[0] === r && selected[1] === c, isValid = validMoves.includes(`${r}-${c}`); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'), fontSize: '1.8rem', position: 'relative' }}> {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>} {getPieceIcon(piece)} </div> ) }))}</div>{gameOver && ( <div className="fade-in" style={{ position: 'absolute', inset: -15, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 60px var(--purple-dim)' }}><i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>{gameOver === 'white' ? 'VICTORY!' : 'GAME OVER'}</h2><p style={{color: 'var(--text2)', marginBottom: 20}}>{gameOver === 'white' ? 'You defeated the Taskora AI.' : 'The AI has claimed your kingdom.'}</p><button className="btn btn-primary" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}}>REMATCH</button></div> )}</div><CapturedArea pieces={capturedBlack} title="ENEMY LOST" /></div><button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}><i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD</button> </div> )
+  return ( <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 30 }}><div style={{ display: 'flex', gap: 20, alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: 40, border: '1px solid var(--purple)' }}><div style={{ color: turn === 'white' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'white' ? '0 0 10px var(--purple)' : 'none' }}>PLAYER</div><div style={{ color: 'var(--text3)' }}>VS</div><div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI</div></div><div style={{ display: 'flex', gap: 30, alignItems: 'flex-start' }}><CapturedArea pieces={capturedWhite} title="LOST" /><div style={{ position: 'relative' }}><div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 60px)', border: '6px solid #1a1a2e', borderRadius: 15, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>{board.map((row, r) => row.map((piece, c) => { const isBlackCell = (r + c) % 2 === 1, isSelected = selected && selected[0] === r && selected[1] === c, isValid = validMoves.includes(`${r}-${c}`); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'), fontSize: '1.8rem', position: 'relative' }}> {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>} {getPieceIcon(piece)} </div> ) }))}</div>{gameOver && ( <div className="fade-in" style={{ position: 'absolute', inset: -15, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 60px var(--purple-dim)' }}><i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>{gameOver === 'white' ? 'VICTORY!' : 'GAME OVER'}</h2><p style={{color: 'var(--text2)', marginBottom: 20}}>{gameOver === 'white' ? 'You defeated the Taskora AI.' : 'The AI has claimed your kingdom.'}</p><button className="btn btn-primary" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}}>REMATCH</button></div> )}</div><CapturedArea pieces={capturedBlack} title="ENEMY LOST" /></div><button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}><i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD</button></div> )
 }
