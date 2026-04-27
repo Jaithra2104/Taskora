@@ -74,6 +74,8 @@ function Sudoku6x6() {
   const [grid, setGrid] = useState(Array(6).fill().map(() => Array(6).fill(0)))
   const [initial, setInitial] = useState([])
   const [selected, setSelected] = useState([null, null])
+  const [invalidCells, setInvalidCells] = useState([])
+  const [glowingGroups, setGlowingGroups] = useState({ rows: [], cols: [], boxes: [] })
   const [win, setWin] = useState(false)
 
   const generatePuzzle = (diff) => {
@@ -91,23 +93,99 @@ function Sudoku6x6() {
       if (newGrid[r][c] !== 0) { newGrid[r][c] = 0; removed++ }
     }
     for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] !== 0) initCells.push(`${r}-${c}`)
-    setGrid(newGrid); setInitial(initCells); setWin(false); setSelected([null, null])
+    setGrid(newGrid); setInitial(initCells); setWin(false); setSelected([null, null]); setInvalidCells([]); setGlowingGroups({ rows: [], cols: [], boxes: [] })
   }
 
   useEffect(() => generatePuzzle(difficulty), [difficulty])
 
+  const validateGrid = (newGrid) => {
+    const invalid = []
+    const newGlow = { rows: [], cols: [], boxes: [] }
+
+    // Check Rows
+    for (let r = 0; r < 6; r++) {
+      const counts = {}, vals = []
+      for (let c = 0; c < 6; c++) {
+        const val = newGrid[r][c]
+        if (val !== 0) {
+          counts[val] = (counts[val] || 0) + 1
+          vals.push(val)
+        }
+      }
+      if (new Set(vals).size === 6) newGlow.rows.push(r)
+      for (let c = 0; c < 6; c++) {
+        if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
+      }
+    }
+
+    // Check Cols
+    for (let c = 0; c < 6; c++) {
+      const counts = {}, vals = []
+      for (let r = 0; r < 6; r++) {
+        const val = newGrid[r][c]
+        if (val !== 0) {
+          counts[val] = (counts[val] || 0) + 1
+          vals.push(val)
+        }
+      }
+      if (new Set(vals).size === 6) newGlow.cols.push(c)
+      for (let r = 0; r < 6; r++) {
+        if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
+      }
+    }
+
+    // Check Boxes (2x3)
+    for (let b = 0; b < 6; b++) {
+      const rStart = Math.floor(b / 2) * 2
+      const cStart = (b % 2) * 3
+      const counts = {}, vals = []
+      for (let r = rStart; r < rStart + 2; r++) {
+        for (let c = cStart; c < cStart + 3; c++) {
+          const val = newGrid[r][c]
+          if (val !== 0) {
+            counts[val] = (counts[val] || 0) + 1
+            vals.push(val)
+          }
+        }
+      }
+      if (new Set(vals).size === 6) newGlow.boxes.push(b)
+      for (let r = rStart; r < rStart + 2; r++) {
+        for (let c = cStart; c < cStart + 3; c++) {
+          if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
+        }
+      }
+    }
+
+    setInvalidCells([...new Set(invalid)])
+    setGlowingGroups(newGlow)
+    
+    // Clear glow after 1.5s
+    setTimeout(() => setGlowingGroups({ rows: [], cols: [], boxes: [] }), 1500)
+
+    if (newGlow.rows.length + newGlow.cols.length + newGlow.boxes.length > 0) {
+        // Only win if entire grid is filled and valid
+        let filled = true
+        for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] === 0) filled = false
+        if (filled && invalid.length === 0) setWin(true)
+    }
+  }
+
   const handleCellClick = (r, c) => !initial.includes(`${r}-${c}`) && setSelected([r, c])
+  
   const handleNumberClick = (num) => {
     if (selected[0] !== null) {
       const newGrid = grid.map(row => [...row])
       newGrid[selected[0]][selected[1]] = num
-      setGrid(newGrid); checkWin(newGrid)
+      setGrid(newGrid); validateGrid(newGrid)
     }
   }
 
-  const checkWin = (currentGrid) => {
-    for (let r = 0; r < 6; r++) for (let c = 0; c < 6; c++) if (currentGrid[r][c] === 0) return
-    setWin(true)
+  const isCellInGlowingGroup = (r, c) => {
+    if (glowingGroups.rows.includes(r)) return true
+    if (glowingGroups.cols.includes(c)) return true
+    const b = Math.floor(r / 2) * 2 + Math.floor(c / 3)
+    if (glowingGroups.boxes.includes(b)) return true
+    return false
   }
 
   return (
@@ -129,9 +207,28 @@ function Sudoku6x6() {
       <div style={{ position: 'relative' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 60px)', border: '4px solid var(--cyan)', borderRadius: 12, overflow: 'hidden', boxShadow: '0 0 50px rgba(0, 243, 255, 0.15)', background: 'rgba(0,0,0,0.3)' }}>
           {grid.map((row, r) => row.map((cell, c) => {
-            const isInitial = initial.includes(`${r}-${c}`), isSelected = selected[0] === r && selected[1] === c
+            const isInitial = initial.includes(`${r}-${c}`)
+            const isSelected = selected[0] === r && selected[1] === c
+            const isInvalid = invalidCells.includes(`${r}-${c}`)
+            const isGlowing = isCellInGlowingGroup(r, c)
+            
             return (
-              <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isInitial ? 'default' : 'pointer', background: isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent', fontSize: '1.6rem', fontWeight: 800, color: isInitial ? 'var(--text1)' : 'var(--cyan)', borderRight: (c + 1) % 3 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', borderBottom: (r + 1) % 2 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', transition: 'all 0.2s', transform: isSelected ? 'scale(1.05)' : 'none', zIndex: isSelected ? 2 : 1 }}>
+              <div 
+                key={`${r}-${c}`} 
+                onClick={() => handleCellClick(r, c)} 
+                style={{ 
+                    width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                    cursor: isInitial ? 'default' : 'pointer', 
+                    background: isInvalid ? 'rgba(239, 68, 68, 0.4)' : (isGlowing ? 'rgba(0, 243, 255, 0.4)' : (isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent')), 
+                    fontSize: '1.6rem', fontWeight: 800, 
+                    color: isInvalid ? 'var(--red)' : (isInitial ? 'var(--text1)' : 'var(--cyan)'), 
+                    borderRight: (c + 1) % 3 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', 
+                    borderBottom: (r + 1) % 2 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', 
+                    transition: 'all 0.3s', 
+                    transform: isSelected || isGlowing ? 'scale(1.05)' : 'none', 
+                    boxShadow: isGlowing ? '0 0 20px var(--cyan)' : 'none',
+                    zIndex: isSelected || isGlowing ? 2 : 1 
+                }}>
                 {cell !== 0 ? cell : ''}
               </div>
             )
@@ -175,7 +272,7 @@ function ChessGame() {
   const [validMoves, setValidMoves] = useState([])
   const [capturedWhite, setCapturedWhite] = useState([])
   const [capturedBlack, setCapturedBlack] = useState([])
-  const [gameOver, setGameOver] = useState(null) // 'white', 'black', or null
+  const [gameOver, setGameOver] = useState(null)
 
   const isWhitePiece = (piece) => piece && piece === piece.toUpperCase()
   const isBlackPiece = (piece) => piece && piece === piece.toLowerCase()
@@ -228,10 +325,7 @@ function ChessGame() {
     if (target) {
       if (isWhitePiece(target)) setCapturedWhite(prev => [...prev, target])
       else setCapturedBlack(prev => [...prev, target])
-      
-      if (target.toLowerCase() === 'k') {
-        setGameOver(isWhitePiece(target) ? 'black' : 'white')
-      }
+      if (target.toLowerCase() === 'k') setGameOver(isWhitePiece(target) ? 'black' : 'white')
     }
     const newBoard = board.map(row => [...row])
     newBoard[tr][tc] = board[sr][sc]; newBoard[sr][sc] = null
@@ -283,7 +377,7 @@ function ChessGame() {
     return <i className={`fas ${icon}`} style={{ color, filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))', fontSize: size }}></i>
   }
 
-  const CapturedArea = ({ pieces, title, side }) => (
+  const CapturedArea = ({ pieces, title }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 60, alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: 10, borderRadius: 12, border: '1px solid var(--border)' }}>
       <div style={{ fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800 }}>{title}</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 400, flexWrap: 'wrap' }}>
@@ -299,10 +393,8 @@ function ChessGame() {
         <div style={{ color: 'var(--text3)' }}>VS</div>
         <div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI</div>
       </div>
-
       <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
         <CapturedArea pieces={capturedWhite} title="LOST" />
-        
         <div style={{ position: 'relative' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 55px)', border: '5px solid #2d1b4e', borderRadius: 10, overflow: 'hidden', boxShadow: '0 0 40px rgba(139, 92, 246, 0.2)' }}>
             {board.map((row, r) => row.map((piece, c) => {
@@ -315,7 +407,6 @@ function ChessGame() {
               )
             }))}
           </div>
-          
           {gameOver && (
             <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 12, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 50px var(--purple-dim)' }}>
               <i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i>
@@ -325,10 +416,8 @@ function ChessGame() {
             </div>
           )}
         </div>
-
         <CapturedArea pieces={capturedBlack} title="ENEMY LOST" />
       </div>
-
       <button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}>
         <i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD
       </button>
