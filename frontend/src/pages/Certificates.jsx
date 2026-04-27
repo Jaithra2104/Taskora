@@ -6,7 +6,7 @@ const CAT_ICON = { academic:'🎓', technical:'💻', sports:'⚽', extracurricu
 const CAT_COLOR = { academic:'var(--cyan)', technical:'var(--purple)', sports:'var(--emerald)', extracurricular:'var(--amber)', workshop:'var(--rose)', other:'var(--text2)' }
 
 export default function Certificates() {
-  const { authFetch } = useAuth()
+  const { authFetch, API_BASE_URL } = useAuth()
   const [certs, setCerts] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [search, setSearch] = useState('')
@@ -111,7 +111,7 @@ export default function Certificates() {
               {c.issued_date && <div style={{ fontSize:'.72rem', color:'var(--text3)', marginBottom:8 }}>📅 {c.issued_date}</div>}
               {c.description && <p style={{ fontSize:'.78rem', color:'var(--text2)', marginBottom:10, lineHeight:1.4 }}>{c.description}</p>}
               <div className="flex gap-8">
-                <a href={c.file_url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-secondary">View File</a>
+                <a href={API_BASE_URL + c.file_url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-secondary">View File</a>
                 <button className="btn btn-sm btn-danger" onClick={() => del(c.id)}>Delete</button>
               </div>
             </div>
