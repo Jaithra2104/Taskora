@@ -52,52 +52,32 @@ export default function Games() {
 
 function LexiCross() {
   const puzzles = [
-    { grid: [['P','Y','T','H','O','N'],['R','.','A','.','U','.'],['O','F','S','E','T','S'],['G','.','K','.','P','.'],['R','E','A','C','T','S'],['A','.','S','.','S','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "A snake-named programming language.", h: "Created by Guido van Rossum.", w: "PYTHON" }, { n: 2, r: 2, c: 0, q: "Index relative to an array start.", h: "Used in low-level memory addressing.", w: "OFSETS" }, { n: 3, r: 4, c: 0, q: "Handles state in modern UI apps.", h: "A popular JS library name starting with R.", w: "REACTS" }], down: [{ n: 1, r: 0, c: 0, q: "Series of instructions for PC.", h: "What developers write all day.", w: "PROGRA" }, { n: 4, r: 0, c: 2, q: "Small duties or jobs assigned.", h: "Tasks that a CPU executes.", w: "TASKS" }, { n: 5, r: 0, c: 4, q: "How data leaves a system.", h: "Opposite of inputs.", w: "OUTPUT" }] } },
+    { grid: [['A','R','R','A','Y','S'],['S','.','E','.','P','.'],['T','A','C','K','S','.'],['A','.','U','.','E','.'],['C','H','A','I','N','S'],['K','.','L','.','T','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Contiguous memory blocks for data.", h: "The most basic data structure.", w: "ARRAYS" }, { n: 2, r: 2, c: 0, q: "LIFO (Last-In First-Out) structures.", h: "Think of a pile of plates.", w: "STACKS" }, { n: 3, r: 4, c: 0, q: "Linked elements in a sequence.", h: "Used in Linked Lists.", w: "CHAINS" }], down: [{ n: 1, r: 0, c: 0, q: "LIFO data structure (Singular).", h: "Push and Pop happen here.", w: "ASTACK" }, { n: 4, r: 0, c: 2, q: "FIFO (First-In First-Out) structure.", h: "Like people standing in a line.", w: "RECALL" }, { n: 5, r: 0, c: 4, q: "Refers to a specific memory address.", h: "Used for direct memory access.", w: "YPENTS" }] } },
     { grid: [['B','I','N','A','R','Y'],['I','.','E','.','O','.'],['K','E','R','N','E','L'],['E','.','V','.','B','.'],['S','O','C','K','E','T'],['.','.','R','.','T','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Base-2 numbering system.", h: "Only 0s and 1s.", w: "BINARY" }, { n: 2, r: 2, c: 0, q: "The core of an OS.", h: "Think Linux or Windows heart.", w: "KERNEL" }, { n: 3, r: 4, c: 0, q: "Endpoint for network communication.", h: "Connects an app to the web.", w: "SOCKET" }], down: [{ n: 1, r: 0, c: 0, q: "Fastest way to travel on two wheels.", h: "Motorcycle cousin.", w: "BIKES" }, { n: 4, r: 0, c: 2, q: "Never ending, like a loop.", h: "Infinite loop property.", w: "NEVER" }, { n: 5, r: 0, c: 4, q: "Automated machine or script.", h: "Short for robot.", w: "ROBOT" }] } },
-    { grid: [['R','O','U','T','E','R'],['O','.','P','.','R','.'],['U','N','L','O','A','D'],['T','.','O','.','S','.'],['E','M','A','I','L','S'],['R','.','D','.','E','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Device that directs data traffic.", h: "Connects your home to ISP.", w: "ROUTER" }, { n: 2, r: 2, c: 0, q: "Remove a driver or app from RAM.", h: "Opposite of loading.", w: "UNLOAD" }, { n: 3, r: 4, c: 0, q: "Digital messages sent online.", h: "Gmail or Outlook content.", w: "EMAILS" }], down: [{ n: 1, r: 0, c: 0, q: "The path data takes.", h: "Another word for path.", w: "ROUTER" }, { n: 4, r: 0, c: 2, q: "Smallest unit of network data.", h: "Data is broken into these.", w: "UPLOAD" }, { n: 5, r: 0, c: 4, q: "Keep data for later use.", h: "HDD/SSD action.", w: "ERASED" }] } }
+    { grid: [['S','O','R','T','E','D'],['O','.','O','.','X','.'],['R','E','C','U','R','S'],['T','.','K','.','A','.'],['E','M','A','I','L','S'],['D','.','S','.','Y','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Array arranged in specific order.", h: "Binary search requires this state.", w: "SORTED" }, { n: 2, r: 2, c: 0, q: "Function calling itself.", h: "Basis of Divide and Conquer.", w: "RECURS" }, { n: 3, r: 4, c: 0, q: "Digital messaging service.", h: "SMTP protocol is used here.", w: "EMAILS" }], down: [{ n: 1, r: 0, c: 0, q: "Arranging data into order.", h: "Bubble, Quick, or Merge...", w: "SORTED" }, { n: 4, r: 0, c: 2, q: "Fixed-size data structure.", h: "Often used in databases.", w: "ROCKSS" }, { n: 5, r: 0, c: 4, q: "A horizontal row in a grid.", h: "A dimension in 2D arrays.", w: "EXRAYS" }] } },
+    { grid: [['G','R','A','P','H','S'],['R','.','L','.','A','.'],['A','V','L','T','R','E'],['P','.','G','.','S','.'],['H','A','S','H','E','S'],['S','.','O','.','S','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Nodes connected by edges.", h: "Used for social network modeling.", w: "GRAPHS" }, { n: 2, r: 2, c: 0, q: "Self-balancing binary search tree.", h: "Named after Adelson-Velsky and Landis.", w: "AVLTRE" }, { n: 3, r: 4, c: 0, q: "Unique IDs generated from data.", h: "Used in Hash Tables/Maps.", w: "HASHES" }], down: [{ n: 1, r: 0, c: 0, q: "Structure with vertices and edges.", h: "Can be directed or undirected.", w: "GRAPHS" }, { n: 4, r: 0, c: 2, q: "Mathematical set of rules.", h: "Instructions to solve a task.", w: "ALGOSY" }, { n: 5, r: 0, c: 4, q: "A single step in a process.", h: "One unit of a sequence.", w: "HARESS" }] } }
   ]
 
   const [puzzle] = useState(() => puzzles[Math.floor(Math.random() * puzzles.length)])
   const [userGrid, setUserGrid] = useState(() => {
       const grid = puzzle.grid.map(row => row.map(cell => cell === '.' ? '.' : ''))
-      // Pre-fill some letters (2-3 random letters)
-      let prefilled = 0
-      while(prefilled < 3) {
-          const r = Math.floor(Math.random()*6), c = Math.floor(Math.random()*6)
-          if (grid[r][c] === '') { grid[r][c] = puzzle.grid[r][c]; prefilled++ }
-      }
-      return grid
+      let prefilled = 0; while(prefilled < 3) { const r = Math.floor(Math.random()*6), c = Math.floor(Math.random()*6); if (grid[r][c] === '') { grid[r][c] = puzzle.grid[r][c]; prefilled++ } }; return grid
   })
   const [selected, setSelected] = useState([0, 0]), [direction, setDirection] = useState('across'), [win, setWin] = useState(false), [hintUsed, setHintUsed] = useState(false), [revealUsed, setRevealUsed] = useState(false), [currentHint, setCurrentHint] = useState(null), [solvedWords, setSolvedWords] = useState([]), [popper, setPopper] = useState(false)
 
   const handleCellClick = (r, c) => { if (puzzle.grid[r][c] === '.') return; if (selected[0] === r && selected[1] === c) setDirection(direction === 'across' ? 'down' : 'across'); else setSelected([r, c]) }
-
   const handleKeyDown = (e) => {
     if (win) return; const [r, c] = selected
     if (e.key.length === 1 && e.key.match(/[a-z0-9]/i)) {
         const newGrid = [...userGrid.map(row => [...row])]; newGrid[r][c] = e.key.toUpperCase(); setUserGrid(newGrid); playSound('click')
-        if (direction === 'across' && c < 5 && puzzle.grid[r][c+1] !== '.') setSelected([r, c+1]); else if (direction === 'down' && r < 5 && puzzle.grid[r+1][c] !== '.') setSelected([r+1, c])
-        checkProgress(newGrid)
+        if (direction === 'across' && c < 5 && puzzle.grid[r][c+1] !== '.') setSelected([r, c+1]); else if (direction === 'down' && r < 5 && puzzle.grid[r+1][c] !== '.') setSelected([r+1, c]); checkProgress(newGrid)
     } else if (e.key === 'Backspace') { const newGrid = [...userGrid.map(row => [...row])]; newGrid[r][c] = ''; setUserGrid(newGrid) }
   }
-
   const checkProgress = (grid) => {
-      let anySolved = false
-      puzzle.clues.across.forEach(cl => {
-          if (!solvedWords.includes(`A-${cl.n}`)) {
-              let word = ""; for(let i=0; i<6; i++) { if(puzzle.grid[cl.r][i] !== '.') word += grid[cl.r][i] }
-              if (word === cl.w) { triggerPopper(); setSolvedWords(prev => [...prev, `A-${cl.n}`]); anySolved = true }
-          }
-      })
-      puzzle.clues.down.forEach(cl => {
-          if (!solvedWords.includes(`D-${cl.n}`)) {
-              let word = ""; for(let i=0; i<6; i++) { if(puzzle.grid[i] && puzzle.grid[i][cl.c] !== '.') word += grid[i][cl.c] }
-              if (word === cl.w) { triggerPopper(); setSolvedWords(prev => [...prev, `D-${cl.n}`]); anySolved = true }
-          }
-      })
+      puzzle.clues.across.forEach(cl => { if (!solvedWords.includes(`A-${cl.n}`)) { let word = ""; for(let i=0; i<6; i++) { if(puzzle.grid[cl.r][i] !== '.') word += grid[cl.r][i] }; if (word === cl.w) { triggerPopper(); setSolvedWords(prev => [...prev, `A-${cl.n}`]) } } })
+      puzzle.clues.down.forEach(cl => { if (!solvedWords.includes(`D-${cl.n}`)) { let word = ""; for(let i=0; i<6; i++) { if(puzzle.grid[i] && puzzle.grid[i][cl.c] !== '.') word += grid[i][cl.c] }; if (word === cl.w) { triggerPopper(); setSolvedWords(prev => [...prev, `D-${cl.n}`]) } } })
       if (grid.every((row, r) => row.every((cell, c) => cell === puzzle.grid[r][c]))) { setWin(true); playSound('win') }
   }
-
   const triggerPopper = () => { setPopper(true); playSound('success'); setTimeout(() => setPopper(false), 2000) }
   useEffect(() => { window.addEventListener('keydown', handleKeyDown); return () => window.removeEventListener('keydown', handleKeyDown) }, [selected, direction, win, solvedWords])
   const useHint = () => { if (hintUsed) return; setHintUsed(true); const clue = direction === 'across' ? puzzle.clues.across.find(cl => cl.r === selected[0]) : puzzle.clues.down.find(cl => cl.c === selected[1]); if (clue) setCurrentHint(clue.h) }
@@ -109,10 +89,7 @@ function LexiCross() {
         {popper && <div className="fade-in" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 100, fontSize: '3rem' }}>🎉🥳✨</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 60px)', background: '#1a1a2e', padding: 10, borderRadius: 15, boxShadow: '0 20px 50px rgba(0,0,0,0.5)', height: 'fit-content', position: 'relative' }}>
-                {userGrid.map((row, r) => row.map((cell, c) => {
-                    const isBlack = cell === '.', isSelected = selected[0] === r && selected[1] === c, num = getCellNum(r, c)
-                    return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, background: isBlack ? '#000' : (isSelected ? 'rgba(16, 185, 129, 0.2)' : '#fff'), border: '1px solid #ddd', cursor: isBlack ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 900, color: '#1a1a2e', position: 'relative' }}> {num && <span style={{ position: 'absolute', top: 2, left: 4, fontSize: '.65rem', color: '#1a1a2e' }}>{num}</span>} {!isBlack && cell} </div> )
-                }))}
+                {userGrid.map((row, r) => row.map((cell, c) => { const isBlack = cell === '.', isSelected = selected[0] === r && selected[1] === c, num = getCellNum(r, c); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, background: isBlack ? '#000' : (isSelected ? 'rgba(16, 185, 129, 0.2)' : '#fff'), border: '1px solid #ddd', cursor: isBlack ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 900, color: '#1a1a2e', position: 'relative' }}> {num && <span style={{ position: 'absolute', top: 2, left: 4, fontSize: '.65rem', color: '#1a1a2e' }}>{num}</span>} {!isBlack && cell} </div> ) }))}
                 {win && <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(5, 46, 22, 0.9)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--emerald)', boxShadow: '0 0 50px var(--emerald)' }}><i className="fas fa-medal" style={{fontSize: '4rem', color: 'var(--yellow)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>GRID MASTER</h2><button className="btn btn-primary" onClick={() => window.location.reload()} style={{marginTop: 20}}>NEW PUZZLE</button></div>}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}><button className="btn" onClick={useHint} disabled={hintUsed} style={{ background: hintUsed ? 'var(--bg2)' : 'rgba(16, 185, 129, 0.1)', color: 'var(--emerald)', border: '1px solid var(--emerald)', opacity: hintUsed ? 0.5 : 1 }}><i className="fas fa-lightbulb" style={{marginRight: 8}}></i> HINT {hintUsed ? '(USED)' : '(1 LEFT)'}</button><button className="btn" onClick={useReveal} disabled={revealUsed} style={{ background: revealUsed ? 'var(--bg2)' : 'rgba(239, 68, 68, 0.1)', color: 'var(--red)', border: '1px solid var(--red)', opacity: revealUsed ? 0.5 : 1 }}><i className="fas fa-eye" style={{marginRight: 8}}></i> REVEAL {revealUsed ? '(USED)' : '(1 LEFT)'}</button></div>
