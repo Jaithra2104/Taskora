@@ -39,46 +39,88 @@ export default function Signup() {
 
   return (
     <div className="auth-container">
+      <div className="auth-bg-shapes">
+        <div className="shape shape-1"></div>
+        <div className="shape shape-2"></div>
+        <div className="shape shape-3"></div>
+      </div>
+
       <div className="auth-card slide-up">
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+          <div className="icon-cycle">
+            <span className="icon-item">🖋️</span>
+            <span className="icon-item">📅</span>
+            <span className="icon-item">🏅</span>
+          </div>
+        </div>
+
         <div className="auth-logo-wrap">📘</div>
         <h2>Create Account</h2>
-        <p className="subtitle">Start your smart study journey today</p>
+        <p className="subtitle">Start your Taskora journey today</p>
 
         {error && <div className="error-msg">⚠ {error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Full Name</label>
-            <input className="form-input" type="text" placeholder="John Doe" required
-              autoComplete="off"
-              value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+          <div className="auth-input-group">
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
+            />
+            <label>Full Name</label>
           </div>
-          <div className="form-group">
-            <label className="form-label">Email Address</label>
-            <input className="form-input" type="email" placeholder="you@email.com" required
-              autoComplete="off"
-              value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+
+          <div className="auth-input-group">
+            <input
+              type="email"
+              className="form-input"
+              placeholder="Email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              required
+            />
+            <label>Email Address</label>
           </div>
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <input className="form-input" type="password" placeholder="Min. 6 characters" required
-              autoComplete="off"
-              value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+
+          <div className="auth-input-group">
+            <input
+              type="password"
+              className="form-input"
+              placeholder="Password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+            />
+            <label>Password</label>
           </div>
-          <div className="form-group">
-            <label className="form-label">Confirm Password</label>
-            <input className="form-input" type="password" placeholder="Re-enter password" required
-              autoComplete="off"
-              value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} />
+
+          <div className="auth-input-group">
+            <input
+              type="password"
+              className="form-input"
+              placeholder="Confirm"
+              value={form.confirm}
+              onChange={(e) => setForm({ ...form, confirm: e.target.value })}
+              required
+            />
+            <label>Confirm Password</label>
           </div>
-          <button className="btn btn-primary w-full" disabled={loading}
-            style={{ justifyContent: 'center', marginTop: 8, padding: '12px' }}>
-            {loading ? 'Creating account...' : 'Create Account →'}
+
+          <button className="btn btn-primary w-full" style={{ justifyContent: 'center', height: 46 }} disabled={loading}>
+            {loading ? (
+              <div className="book-loader">
+                <div className="book-back"></div>
+                <div className="book-page"></div>
+              </div>
+            ) : 'Create Account'}
           </button>
         </form>
 
         <div className="auth-footer">
-          Already have an account? <Link to="/login">Sign in</Link>
+          Already have an account? <Link to="/login">Sign In</Link>
         </div>
       </div>
     </div>
