@@ -11,6 +11,8 @@ import Certificates from './pages/Certificates'
 import Syllabus from './pages/Syllabus'
 import StudyAssistant from './pages/StudyAssistant'
 
+import Profile from './pages/Profile'
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <div className="auth-container"><div className="card"><p>Loading...</p></div></div>
@@ -41,6 +43,7 @@ function AppRoutes() {
       <Route path="/certificates" element={<ProtectedRoute><AppLayout><Certificates /></AppLayout></ProtectedRoute>} />
       <Route path="/syllabus" element={<ProtectedRoute><AppLayout><Syllabus /></AppLayout></ProtectedRoute>} />
       <Route path="/study" element={<ProtectedRoute><AppLayout><StudyAssistant /></AppLayout></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )

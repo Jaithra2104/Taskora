@@ -22,6 +22,7 @@ CORS(app, origins=["https://taskora-khaki.vercel.app", "http://localhost:5173"])
 jwt = JWTManager(app)
 
 # Register blueprints
+from routes.profile import profile_bp
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(timetable_bp, url_prefix='/api/timetable')
 app.register_blueprint(homework_bp, url_prefix='/api/homework')
@@ -29,6 +30,7 @@ app.register_blueprint(assignments_bp, url_prefix='/api/assignments')
 app.register_blueprint(certificates_bp, url_prefix='/api/certificates')
 app.register_blueprint(syllabus_bp, url_prefix='/api/syllabus')
 app.register_blueprint(study_bp, url_prefix='/api/study')
+app.register_blueprint(profile_bp, url_prefix='/api/profile')
 
 
 # Serve uploaded files — handles Windows path separators

@@ -66,6 +66,22 @@ def init_db():
         except Exception as e:
             print(f"[DB INIT] Warning on table: {e}")
 
+    # Auto-migration for user profile fields
+    user_fields = [
+        ("first_name", "TEXT"),
+        ("last_name", "TEXT"),
+        ("mobile_no", "TEXT"),
+        ("linkedin", "TEXT"),
+        ("github", "TEXT"),
+        ("profile_pic", "TEXT"),
+        ("bio", "TEXT")
+    ]
+    for field, ftype in user_fields:
+        try:
+            db.execute(f"ALTER TABLE users ADD COLUMN {field} {ftype}")
+        except Exception:
+            pass # Column likely exists
+
     db.commit()
     db.close()
     print("[OK] Database initialized successfully")

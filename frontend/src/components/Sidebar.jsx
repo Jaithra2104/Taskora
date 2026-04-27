@@ -10,6 +10,7 @@ const NAV = [
   { path: '/certificates', label: 'Certificates', icon: '✦' },
   { path: '/syllabus', label: 'Syllabus', icon: '◉' },
   { path: '/study', label: 'Study Assistant', icon: '⬡' },
+  { path: '/profile', label: 'My Profile', icon: '👤' },
 ]
 
 export default function Sidebar() {
@@ -61,7 +62,7 @@ export default function Sidebar() {
 
         {/* Footer */}
         <div className="sidebar-footer">
-          <div className="user-chip">
+          <div className="user-chip" onClick={() => navigate('/profile')} style={{ cursor: 'pointer', transition: 'background 0.2s' }}>
             <div className="user-avatar">{initials}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="user-name" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
