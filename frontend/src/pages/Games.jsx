@@ -25,43 +25,47 @@ export default function Games() {
               key={game.id} 
               className="card hover-glow" 
               onClick={() => setActiveGame(game.id)}
-              style={{ cursor: 'pointer', textAlign: 'center', border: `1px solid ${game.color}33` }}
+              style={{ cursor: 'pointer', textAlign: 'center', border: `1px solid ${game.color}33`, padding: '40px 20px' }}
             >
               <div style={{ 
-                width: 80, height: 80, borderRadius: '50%', background: `${game.color}11`, 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
-                fontSize: '2.5rem', color: game.color, border: `2px solid ${game.color}44`,
-                boxShadow: `0 0 20px ${game.color}22`
+                width: 90, height: 90, borderRadius: '24px', background: `${game.color}11`, 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 25px',
+                fontSize: '2.8rem', color: game.color, border: `2px solid ${game.color}44`,
+                boxShadow: `0 0 30px ${game.color}22`,
+                transform: 'rotate(-5deg)'
               }}>
                 <i className={`fas ${game.icon}`}></i>
               </div>
-              <h3 style={{ fontSize: '1.4rem', marginBottom: 10 }}>{game.name}</h3>
-              <p style={{ color: 'var(--text2)', fontSize: '.9rem' }}>{game.desc}</p>
-              <button className="btn" style={{ marginTop: 20, background: 'var(--glass)', border: `1px solid ${game.color}66`, color: game.color }}>
-                PLAY NOW
+              <h3 style={{ fontSize: '1.5rem', marginBottom: 12, fontWeight: 900 }}>{game.name}</h3>
+              <p style={{ color: 'var(--text2)', fontSize: '.95rem', lineHeight: 1.5, marginBottom: 25 }}>{game.desc}</p>
+              <button className="btn" style={{ width: '100%', background: 'var(--glass)', border: `1px solid ${game.color}66`, color: game.color, fontWeight: 800 }}>
+                LAUNCH GAME
               </button>
             </div>
           ))}
         </div>
       ) : (
-        <div className="card" style={{ minHeight: '700px', display: 'flex', flexDirection: 'column', padding: '30px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
-            <button onClick={() => setActiveGame(null)} className="btn" style={{ background: 'var(--bg2)', padding: '10px 20px' }}>
-              <i className="fas fa-arrow-left" style={{marginRight: 8}}></i> BACK TO HUB
+        <div className="card arcade-container" style={{ minHeight: '750px', display: 'flex', flexDirection: 'column', padding: '0', overflow: 'hidden', border: `1px solid ${GAMES.find(g => g.id === activeGame).color}33` }}>
+          <div style={{ padding: '25px 35px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
+            <button onClick={() => setActiveGame(null)} className="btn hover-scale" style={{ background: 'var(--bg2)', padding: '10px 20px', borderRadius: 12 }}>
+              <i className="fas fa-chevron-left" style={{marginRight: 10}}></i> EXIT HUB
             </button>
-            <h2 style={{ color: GAMES.find(g => g.id === activeGame).color, fontSize: '1.8rem', fontWeight: 900, textShadow: `0 0 20px ${GAMES.find(g => g.id === activeGame).color}66` }}>
-              <i className={`fas ${GAMES.find(g => g.id === activeGame).icon}`} style={{marginRight: 12}}></i> 
-              {GAMES.find(g => g.id === activeGame).name}
-            </h2>
+            <div style={{ textAlign: 'center' }}>
+                <h2 style={{ color: GAMES.find(g => g.id === activeGame).color, fontSize: '1.8rem', fontWeight: 900, textShadow: `0 0 25px ${GAMES.find(g => g.id === activeGame).color}66`, margin: 0 }}>
+                    {GAMES.find(g => g.id === activeGame).name.toUpperCase()}
+                </h2>
+                <div style={{ width: 40, height: 4, background: GAMES.find(g => g.id === activeGame).color, margin: '8px auto 0', borderRadius: 10 }}></div>
+            </div>
             <div style={{ width: 140 }}></div>
           </div>
           
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: 20, border: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
-             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '300px', height: '300px', background: GAMES.find(g => g.id === activeGame).color, filter: 'blur(150px)', opacity: 0.1, pointerEvents: 'none' }}></div>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f', position: 'relative', overflow: 'hidden' }}>
+             {/* Dynamic background particles */}
+             <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '120%', background: `radial-gradient(circle at 50% 50%, ${GAMES.find(g => g.id === activeGame).color}08 0%, transparent 70%)`, pointerEvents: 'none' }}></div>
              
             {activeGame === 'sudoku' && <Sudoku6x6 />}
             {activeGame === 'chess' && <ChessGame />}
-            {activeGame === 'crossword' && <div className="text-center" style={{position: 'relative'}}><i className="fas fa-font" style={{fontSize: '5rem', color: 'var(--emerald)', marginBottom: 20, filter: 'drop-shadow(0 0 15px var(--emerald))'}}></i><p style={{fontSize: '1.2rem', fontWeight: 700}}>LexiCross Daily Grid</p><p style={{fontSize: '.9rem', color: 'var(--text3)'}}>New puzzles arrive every 24 hours.</p></div>}
+            {activeGame === 'crossword' && <div className="text-center" style={{position: 'relative'}}><i className="fas fa-font" style={{fontSize: '6rem', color: 'var(--emerald)', marginBottom: 25, filter: 'drop-shadow(0 0 20px var(--emerald))'}}></i><p style={{fontSize: '1.4rem', fontWeight: 900}}>LEXICROSS DAILY</p><p style={{fontSize: '.95rem', color: 'var(--text3)'}}>New vocabulary puzzles arrive every 24 hours.</p></div>}
           </div>
         </div>
       )}
@@ -78,11 +82,15 @@ function Sudoku6x6() {
   const [glowingGroups, setGlowingGroups] = useState({ rows: [], cols: [], boxes: [] })
   const [win, setWin] = useState(false)
   const [seconds, setSeconds] = useState(0)
-  const [highScore, setHighScore] = useState(() => localStorage.getItem('sudoku_high_score') || null)
+  const [highScores, setHighScores] = useState(() => {
+    const saved = localStorage.getItem('taskora_sudoku_scores')
+    return saved ? JSON.parse(saved) : { easy: null, medium: null, hard: null }
+  })
   
   const timerRef = useRef(null)
 
   const formatTime = (s) => {
+    if (s === null) return '--:--'
     const mins = Math.floor(s / 60)
     const secs = s % 60
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`
@@ -132,8 +140,7 @@ function Sudoku6x6() {
     for (let r = 0; r < 6; r++) {
       const counts = {}, vals = []
       for (let c = 0; c < 6; c++) {
-        const val = newGrid[r][c]
-        if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
+        const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
       }
       if (new Set(vals).size === 6) newGlow.rows.push(r)
       for (let c = 0; c < 6; c++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
@@ -142,8 +149,7 @@ function Sudoku6x6() {
     for (let c = 0; c < 6; c++) {
       const counts = {}, vals = []
       for (let r = 0; r < 6; r++) {
-        const val = newGrid[r][c]
-        if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
+        const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
       }
       if (new Set(vals).size === 6) newGlow.cols.push(c)
       for (let r = 0; r < 6; r++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
@@ -154,8 +160,7 @@ function Sudoku6x6() {
       const counts = {}, vals = []
       for (let r = rStart; r < rStart + 2; r++) {
         for (let c = cStart; c < cStart + 3; c++) {
-          const val = newGrid[r][c]
-          if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
+          const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
         }
       }
       if (new Set(vals).size === 6) newGlow.boxes.push(b)
@@ -166,7 +171,7 @@ function Sudoku6x6() {
 
     setInvalidCells([...new Set(invalid)])
     setGlowingGroups(newGlow)
-    setTimeout(() => setGlowingGroups({ rows: [], cols: [], boxes: [] }), 1500)
+    setTimeout(() => setGlowingGroups({ rows: [], cols: [], boxes: [] }), 1200)
 
     let filled = true
     for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] === 0) filled = false
@@ -174,10 +179,11 @@ function Sudoku6x6() {
     if (filled && invalid.length === 0) {
       setWin(true)
       clearInterval(timerRef.current)
-      // Check High Score
-      if (!highScore || seconds < parseInt(highScore)) {
-        localStorage.setItem('sudoku_high_score', seconds.toString())
-        setHighScore(seconds.toString())
+      const currentBest = highScores[difficulty]
+      if (currentBest === null || seconds < currentBest) {
+        const updated = { ...highScores, [difficulty]: seconds }
+        setHighScores(updated)
+        localStorage.setItem('taskora_sudoku_scores', JSON.stringify(updated))
       }
     }
   }
@@ -199,64 +205,76 @@ function Sudoku6x6() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, padding: 20, width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: 500, background: 'rgba(0,0,0,0.3)', padding: '15px 25px', borderRadius: 15, border: '1px solid var(--border)' }}>
-          <div style={{textAlign: 'center'}}>
-            <div style={{fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800}}>CURRENT TIME</div>
-            <div style={{fontSize: '1.4rem', fontWeight: 900, color: 'var(--cyan)'}}>{formatTime(seconds)}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 25, padding: '30px', width: '100%', maxWidth: 800 }}>
+      {/* Stats Board */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, width: '100%', maxWidth: 500 }}>
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center', boxShadow: 'inset 0 0 15px rgba(0,0,0,0.5)' }}>
+            <div style={{fontSize: '.75rem', color: 'var(--text3)', fontWeight: 800, letterSpacing: 1, marginBottom: 5}}>TIMER</div>
+            <div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--cyan)', fontFamily: 'monospace'}}>{formatTime(seconds)}</div>
           </div>
-          <div style={{textAlign: 'center'}}>
-            <div style={{fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800}}>PERSONAL BEST</div>
-            <div style={{fontSize: '1.4rem', fontWeight: 900, color: 'var(--yellow)'}}>
-              {highScore ? formatTime(parseInt(highScore)) : '--:--'}
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center', boxShadow: 'inset 0 0 15px rgba(0,0,0,0.5)' }}>
+            <div style={{fontSize: '.75rem', color: 'var(--text3)', fontWeight: 800, letterSpacing: 1, marginBottom: 5}}>{difficulty.toUpperCase()} BEST</div>
+            <div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--yellow)', fontFamily: 'monospace'}}>
+              {formatTime(highScores[difficulty])}
             </div>
           </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 20, width: '100%', maxWidth: 400 }}>
-         <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-            <label className="form-label" style={{fontSize: '.8rem'}}>DIFFICULTY</label>
-            <select className="form-input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} style={{ background: 'var(--bg2)', cursor: 'pointer' }}>
-              <option value="easy">Easy (Warmup)</option>
-              <option value="medium">Medium (Focus)</option>
-              <option value="hard">Hard (Genius)</option>
+      {/* Control Panel */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 15, width: '100%', maxWidth: 500, background: 'var(--bg2)', padding: '15px', borderRadius: 25, border: '1px solid var(--border)' }}>
+         <div style={{ flex: 1 }}>
+            <select className="form-input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} style={{ background: 'transparent', border: 'none', fontWeight: 800, color: 'var(--cyan)', height: '40px' }}>
+              <option value="easy">EASY MODE</option>
+              <option value="medium">MEDIUM MODE</option>
+              <option value="hard">HARD MODE</option>
             </select>
          </div>
-         <button className="btn" onClick={() => generatePuzzle(difficulty)} style={{ alignSelf: 'flex-end', height: 45, background: 'var(--cyan-dim)', color: 'var(--cyan)' }}>
-            <i className="fas fa-rotate"></i> RESET
+         <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ height: 40, padding: '0 25px', borderRadius: 15 }}>
+            <i className="fas fa-rotate" style={{marginRight: 8}}></i> NEW GRID
          </button>
       </div>
 
       <div style={{ position: 'relative' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 60px)', border: '4px solid var(--cyan)', borderRadius: 12, overflow: 'hidden', boxShadow: '0 0 50px rgba(0, 243, 255, 0.15)', background: 'rgba(0,0,0,0.3)' }}>
+        <div style={{ 
+            display: 'grid', gridTemplateColumns: 'repeat(6, 65px)', 
+            border: '6px solid #1a1a2e', borderRadius: 20, overflow: 'hidden',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)', background: '#0f0f1a' 
+        }}>
           {grid.map((row, r) => row.map((cell, c) => {
             const isInitial = initial.includes(`${r}-${c}`), isSelected = selected[0] === r && selected[1] === c, isInvalid = invalidCells.includes(`${r}-${c}`), isGlowing = isCellInGlowingGroup(r, c)
             return (
-              <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isInitial ? 'default' : 'pointer', background: isInvalid ? 'rgba(239, 68, 68, 0.4)' : (isGlowing ? 'rgba(0, 243, 255, 0.4)' : (isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent')), fontSize: '1.6rem', fontWeight: 800, color: isInvalid ? 'var(--red)' : (isInitial ? 'var(--text1)' : 'var(--cyan)'), borderRight: (c + 1) % 3 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', borderBottom: (r + 1) % 2 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', transition: 'all 0.3s', transform: isSelected || isGlowing ? 'scale(1.05)' : 'none', boxShadow: isGlowing ? '0 0 20px var(--cyan)' : 'none', zIndex: isSelected || isGlowing ? 2 : 1 }}>
+              <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 65, height: 65, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isInitial ? 'default' : 'pointer', background: isInvalid ? 'rgba(239, 68, 68, 0.4)' : (isGlowing ? 'rgba(0, 243, 255, 0.4)' : (isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent')), fontSize: '1.8rem', fontWeight: 900, color: isInvalid ? '#ff4d4d' : (isInitial ? '#fff' : 'var(--cyan)'), borderRight: (c + 1) % 3 === 0 ? '4px solid #1a1a2e' : '1px solid #1e1e30', borderBottom: (r + 1) % 2 === 0 ? '4px solid #1a1a2e' : '1px solid #1e1e30', transition: 'all 0.3s', transform: isSelected || isGlowing ? 'scale(1.08)' : 'none', boxShadow: isGlowing ? '0 0 25px var(--cyan)' : 'none', zIndex: isSelected || isGlowing ? 2 : 1 }}>
                 {cell !== 0 ? cell : ''}
               </div>
             )
           }))}
         </div>
+        
         {win && (
-          <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--emerald)', boxShadow: '0 0 40px var(--emerald-dim)' }}>
-            <i className="fas fa-trophy" style={{fontSize: '4rem', color: 'var(--yellow)', marginBottom: 20}}></i>
-            <h2 style={{color: 'var(--emerald)', fontSize: '2rem', fontWeight: 900}}>ZEN ACHIEVED!</h2>
-            <p style={{color: '#fff', marginBottom: 5}}>Time Taken: {formatTime(seconds)}</p>
-            {seconds === parseInt(highScore) && <p style={{color: 'var(--yellow)', fontWeight: 800, marginBottom: 20}}>✨ NEW PERSONAL BEST! ✨</p>}
-            <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)}>PLAY AGAIN</button>
+          <div className="fade-in" style={{ position: 'absolute', inset: -20, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 30, zIndex: 10, border: '2px solid var(--cyan)', boxShadow: '0 0 60px var(--cyan-dim)' }}>
+            <div style={{ width: 100, height: 100, background: 'var(--grad-cyan)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 25, boxShadow: '0 0 40px var(--cyan)' }}>
+                <i className="fas fa-check" style={{fontSize: '3.5rem', color: '#000'}}></i>
+            </div>
+            <h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900, letterSpacing: 2}}>LEVEL COMPLETE</h2>
+            <div style={{ display: 'flex', gap: 30, margin: '20px 0' }}>
+                <div style={{textAlign: 'center'}}><p style={{fontSize: '.8rem', color: 'var(--text3)'}}>TIME</p><h3 style={{fontSize: '1.8rem', color: 'var(--cyan)'}}>{formatTime(seconds)}</h3></div>
+                <div style={{textAlign: 'center'}}><p style={{fontSize: '.8rem', color: 'var(--text3)'}}>BEST</p><h3 style={{fontSize: '1.8rem', color: 'var(--yellow)'}}>{formatTime(highScores[difficulty])}</h3></div>
+            </div>
+            {seconds === highScores[difficulty] && <div className="pulse" style={{ color: 'var(--yellow)', fontWeight: 900, marginBottom: 25 }}>🏆 NEW RECORD SET! 🏆</div>}
+            <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ padding: '15px 40px', fontSize: '1.1rem', borderRadius: 20 }}>PLAY NEXT ROUND</button>
           </div>
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+      {/* Number Pad */}
+      <div style={{ display: 'flex', gap: 15, flexWrap: 'wrap', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: 30, border: '1px solid var(--border)' }}>
         {[1,2,3,4,5,6].map(num => (
-          <button key={num} onClick={() => handleNumberClick(num)} className="btn hover-glow" style={{ width: 55, height: 55, borderRadius: 12, padding: 0, justifyContent: 'center', fontSize: '1.4rem', fontWeight: 800, background: 'var(--bg2)', border: '2px solid var(--cyan)', color: 'var(--cyan)' }}>
+          <button key={num} onClick={() => handleNumberClick(num)} className="btn hover-glow" style={{ width: 65, height: 65, borderRadius: 20, padding: 0, justifyContent: 'center', fontSize: '1.8rem', fontWeight: 900, background: 'var(--bg2)', border: '2px solid var(--cyan)', color: 'var(--cyan)', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
             {num}
           </button>
         ))}
-        <button onClick={() => handleNumberClick(0)} className="btn" style={{ width: 80, height: 55, padding: 0, justifyContent: 'center', border: '2px solid var(--red)', color: 'var(--red)', background: 'rgba(239, 68, 68, 0.1)' }}>
-          <i className="fas fa-eraser" style={{marginRight: 8}}></i> CLEAR
+        <button onClick={() => handleNumberClick(0)} className="btn" style={{ width: 100, height: 65, borderRadius: 20, padding: 0, justifyContent: 'center', border: '2px solid var(--red)', color: '#ff4d4d', background: 'rgba(239, 68, 68, 0.05)', fontWeight: 800 }}>
+          ERASE
         </button>
       </div>
     </div>
@@ -274,17 +292,9 @@ function ChessGame() {
   const isWhitePiece = (piece) => piece && piece === piece.toUpperCase(); const isBlackPiece = (piece) => piece && piece === piece.toLowerCase()
   const getValidMoves = (r, c, b) => {
     const piece = b[r][c]; if (!piece) return []; const type = piece.toLowerCase(), isWhite = isWhitePiece(piece), moves = []
-    const addMove = (nr, nc) => {
-      if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-        const target = b[nr][nc]; if (!target || (isWhite ? isBlackPiece(target) : isWhitePiece(target))) { moves.push(`${nr}-${nc}`); return !target }
-      }
-      return false
-    }
-    if (type === 'p') {
-      const dir = isWhite ? -1 : 1, startRow = isWhite ? 6 : 1
-      if (b[r + dir] && !b[r + dir][c]) { moves.push(`${r + dir}-${c}`); if (r === startRow && !b[r + 2 * dir][c]) moves.push(`${r + 2 * dir}-${c}`) }
-      [c - 1, c + 1].forEach(nc => { if (nc >= 0 && nc < 8 && b[r + dir] && b[r + dir][nc]) { const target = b[r + dir][nc]; if (isWhite ? isBlackPiece(target) : isWhitePiece(target)) moves.push(`${r + dir}-${nc}`) } })
-    } else if (type === 'n') [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => addMove(r + dr, c + dc))
+    const addMove = (nr, nc) => { if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) { const target = b[nr][nc]; if (!target || (isWhite ? isBlackPiece(target) : isWhitePiece(target))) { moves.push(`${nr}-${nc}`); return !target } } return false }
+    if (type === 'p') { const dir = isWhite ? -1 : 1, startRow = isWhite ? 6 : 1; if (b[r + dir] && !b[r + dir][c]) { moves.push(`${r + dir}-${c}`); if (r === startRow && !b[r + 2 * dir][c]) moves.push(`${r + 2 * dir}-${c}`) }; [c - 1, c + 1].forEach(nc => { if (nc >= 0 && nc < 8 && b[r + dir] && b[r + dir][nc]) { const target = b[r + dir][nc]; if (isWhite ? isBlackPiece(target) : isWhitePiece(target)) moves.push(`${r + dir}-${nc}`) } }) }
+    else if (type === 'n') [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => addMove(r + dr, c + dc))
     else if (type === 'r' || type === 'q') [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([dr, dc]) => { let nr = r + dr, nc = c + dc; while (addMove(nr, nc)) { nr += dr; nc += dc } })
     if (type === 'b' || type === 'q') [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([dr, dc]) => { let nr = r + dr, nc = c + dc; while (addMove(nr, nc)) { nr += dr; nc += dc } })
     else if (type === 'k') for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) if (dr !== 0 || dc !== 0) addMove(r + dr, c + dc)
@@ -320,9 +330,9 @@ function ChessGame() {
     </div>
   )
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 20 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 30 }}>
       <div style={{ display: 'flex', gap: 20, alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: 40, border: '1px solid var(--purple)' }}><div style={{ color: turn === 'white' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'white' ? '0 0 10px var(--purple)' : 'none' }}>PLAYER</div><div style={{ color: 'var(--text3)' }}>VS</div><div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI</div></div>
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}><CapturedArea pieces={capturedWhite} title="LOST" /><div style={{ position: 'relative' }}><div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 55px)', border: '5px solid #2d1b4e', borderRadius: 10, overflow: 'hidden', boxShadow: '0 0 40px rgba(139, 92, 246, 0.2)' }}>{board.map((row, r) => row.map((piece, c) => { const isBlackCell = (r + c) % 2 === 1, isSelected = selected && selected[0] === r && selected[1] === c, isValid = validMoves.includes(`${r}-${c}`); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 55, height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'), fontSize: '1.8rem', position: 'relative' }}> {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>} {getPieceIcon(piece)} </div> ) }))}</div>{gameOver && ( <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 12, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 50px var(--purple-dim)' }}><i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.2rem', fontWeight: 900}}>{gameOver === 'white' ? 'VICTORY!' : 'GAME OVER'}</h2><p style={{color: 'var(--text2)', marginBottom: 20}}>{gameOver === 'white' ? 'You defeated the Taskora AI.' : 'The AI has claimed your kingdom.'}</p><button className="btn btn-primary" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}}>REMATCH</button></div> )}</div><CapturedArea pieces={capturedBlack} title="ENEMY LOST" /></div>
+      <div style={{ display: 'flex', gap: 30, alignItems: 'flex-start' }}><CapturedArea pieces={capturedWhite} title="LOST" /><div style={{ position: 'relative' }}><div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 60px)', border: '6px solid #1a1a2e', borderRadius: 15, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>{board.map((row, r) => row.map((piece, c) => { const isBlackCell = (r + c) % 2 === 1, isSelected = selected && selected[0] === r && selected[1] === c, isValid = validMoves.includes(`${r}-${c}`); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'), fontSize: '1.8rem', position: 'relative' }}> {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>} {getPieceIcon(piece)} </div> ) }))}</div>{gameOver && ( <div className="fade-in" style={{ position: 'absolute', inset: -15, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 60px var(--purple-dim)' }}><i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>{gameOver === 'white' ? 'VICTORY!' : 'GAME OVER'}</h2><p style={{color: 'var(--text2)', marginBottom: 20}}>{gameOver === 'white' ? 'You defeated the Taskora AI.' : 'The AI has claimed your kingdom.'}</p><button className="btn btn-primary" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}}>REMATCH</button></div> )}</div><CapturedArea pieces={capturedBlack} title="ENEMY LOST" /></div>
       <button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}><i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD</button>
     </div>
   )
