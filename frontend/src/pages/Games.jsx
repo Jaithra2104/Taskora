@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const GAMES = [
-  { id: 'sudoku', name: 'Sudoku Zen', icon: 'fa-table-cells', color: 'var(--cyan)', desc: 'Sharpen your logic with classic 9x9 puzzles.' },
+  { id: 'sudoku', name: 'Sudoku Zen 6x6', icon: 'fa-table-cells', color: 'var(--cyan)', desc: 'Fast-paced logic training with 6x6 grids.' },
   { id: 'chess', name: 'Grandmaster Chess', icon: 'fa-chess', color: 'var(--purple)', desc: 'Strategic mastery for the sharpest minds.' },
   { id: 'crossword', name: 'LexiCross', icon: 'fa-font', color: 'var(--emerald)', desc: 'Boost your vocabulary with daily word grids.' }
 ]
@@ -44,21 +44,25 @@ export default function Games() {
           ))}
         </div>
       ) : (
-        <div className="card" style={{ minHeight: '600px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <button onClick={() => setActiveGame(null)} className="btn" style={{ background: 'var(--bg2)', padding: '8px 16px' }}>
-              <i className="fas fa-arrow-left"></i> BACK TO HUB
+        <div className="card" style={{ minHeight: '650px', display: 'flex', flexDirection: 'column', padding: '30px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
+            <button onClick={() => setActiveGame(null)} className="btn" style={{ background: 'var(--bg2)', padding: '10px 20px' }}>
+              <i className="fas fa-arrow-left" style={{marginRight: 8}}></i> BACK TO HUB
             </button>
-            <h3 style={{ color: GAMES.find(g => g.id === activeGame).color }}>
-              <i className={`fas ${GAMES.find(g => g.id === activeGame).icon}`}></i> {GAMES.find(g => g.id === activeGame).name}
-            </h3>
-            <div style={{ width: 100 }}></div>
+            <h2 style={{ color: GAMES.find(g => g.id === activeGame).color, fontSize: '1.8rem', fontWeight: 900, textShadow: `0 0 20px ${GAMES.find(g => g.id === activeGame).color}66` }}>
+              <i className={`fas ${GAMES.find(g => g.id === activeGame).icon}`} style={{marginRight: 12}}></i> 
+              {GAMES.find(g => g.id === activeGame).name}
+            </h2>
+            <div style={{ width: 140 }}></div>
           </div>
           
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg2)', borderRadius: 12, border: '1px solid var(--border)' }}>
-            {activeGame === 'sudoku' && <SudokuGame />}
-            {activeGame === 'chess' && <div className="text-center"><i className="fas fa-chess-knight" style={{fontSize: '4rem', color: 'var(--purple)', marginBottom: 20}}></i><p>Chess Engine Loading... <br/><span style={{fontSize: '.8rem', color: 'var(--text3)'}}>Multiplayer Chess Module coming soon!</span></p></div>}
-            {activeGame === 'crossword' && <div className="text-center"><i className="fas fa-font" style={{fontSize: '4rem', color: 'var(--emerald)', marginBottom: 20}}></i><p>LexiCross Daily Grid<br/><span style={{fontSize: '.8rem', color: 'var(--text3)'}}>New puzzles arrive every 24 hours.</span></p></div>}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: 20, border: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
+             {/* Background glow effect */}
+             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '300px', height: '300px', background: GAMES.find(g => g.id === activeGame).color, filter: 'blur(150px)', opacity: 0.1, pointerEvents: 'none' }}></div>
+             
+            {activeGame === 'sudoku' && <Sudoku6x6 />}
+            {activeGame === 'chess' && <div className="text-center" style={{position: 'relative'}}><i className="fas fa-chess-knight" style={{fontSize: '5rem', color: 'var(--purple)', marginBottom: 20, filter: 'drop-shadow(0 0 15px var(--purple))'}}></i><p style={{fontSize: '1.2rem', fontWeight: 700}}>Chess Engine Loading...</p><p style={{fontSize: '.9rem', color: 'var(--text3)'}}>Multiplayer Chess Module coming soon!</p></div>}
+            {activeGame === 'crossword' && <div className="text-center" style={{position: 'relative'}}><i className="fas fa-font" style={{fontSize: '5rem', color: 'var(--emerald)', marginBottom: 20, filter: 'drop-shadow(0 0 15px var(--emerald))'}}></i><p style={{fontSize: '1.2rem', fontWeight: 700}}>LexiCross Daily Grid</p><p style={{fontSize: '.9rem', color: 'var(--text3)'}}>New puzzles arrive every 24 hours.</p></div>}
           </div>
         </div>
       )}
@@ -66,62 +70,156 @@ export default function Games() {
   )
 }
 
-function SudokuGame() {
-  const [grid, setGrid] = useState([
-    [5, 3, 0, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 0, 0, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9]
-  ])
-
+function Sudoku6x6() {
+  const [difficulty, setDifficulty] = useState('easy')
+  const [grid, setGrid] = useState(Array(6).fill().map(() => Array(6).fill(0)))
+  const [initial, setInitial] = useState([])
   const [selected, setSelected] = useState([null, null])
+  const [win, setWin] = useState(false)
 
-  const handleCellClick = (r, c) => setSelected([r, c])
+  const generatePuzzle = (diff) => {
+    // Basic 6x6 Sudoku Generator logic (simplified for demonstration)
+    const base = [
+      [1, 2, 3, 4, 5, 6],
+      [4, 5, 6, 1, 2, 3],
+      [2, 3, 1, 5, 6, 4],
+      [5, 6, 4, 2, 3, 1],
+      [3, 1, 2, 6, 4, 5],
+      [6, 4, 5, 3, 1, 2]
+    ]
+    // Randomize slightly
+    const shuffled = [...base].sort(() => Math.random() - 0.5)
+    
+    // Remove cells based on difficulty
+    const cellsToRemove = diff === 'easy' ? 12 : (diff === 'medium' ? 18 : 24)
+    const newGrid = shuffled.map(row => [...row])
+    const initCells = []
+    
+    let removed = 0
+    while (removed < cellsToRemove) {
+      const r = Math.floor(Math.random() * 6)
+      const c = Math.floor(Math.random() * 6)
+      if (newGrid[r][c] !== 0) {
+        newGrid[r][c] = 0
+        removed++
+      }
+    }
+
+    for(let r=0; r<6; r++) {
+      for(let c=0; c<6; c++) {
+        if(newGrid[r][c] !== 0) initCells.push(`${r}-${c}`)
+      }
+    }
+
+    setGrid(newGrid)
+    setInitial(initCells)
+    setWin(false)
+    setSelected([null, null])
+  }
+
+  useEffect(() => {
+    generatePuzzle(difficulty)
+  }, [difficulty])
+
+  const handleCellClick = (r, c) => {
+    if (initial.includes(`${r}-${c}`)) return
+    setSelected([r, c])
+  }
 
   const handleNumberClick = (num) => {
     if (selected[0] !== null) {
-      const newGrid = [...grid]
+      const newGrid = grid.map(row => [...row])
       newGrid[selected[0]][selected[1]] = num
       setGrid(newGrid)
+      checkWin(newGrid)
     }
   }
 
+  const checkWin = (currentGrid) => {
+    // Very simple check: no zeros
+    for (let r = 0; r < 6; r++) {
+      for (let c = 0; c < 6; c++) {
+        if (currentGrid[r][c] === 0) return
+      }
+    }
+    setWin(true)
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 30, padding: 20 }}>
-      <div style={{ 
-        display: 'grid', gridTemplateColumns: 'repeat(9, 45px)', border: '3px solid var(--cyan)', 
-        boxShadow: '0 0 30px var(--cyan-dim)' 
-      }}>
-        {grid.map((row, r) => row.map((cell, c) => (
-          <div 
-            key={`${r}-${c}`}
-            onClick={() => handleCellClick(r, c)}
-            style={{ 
-              width: 45, height: 45, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: '1px solid var(--border)', cursor: 'pointer',
-              background: selected[0] === r && selected[1] === c ? 'var(--cyan-dim)' : 'transparent',
-              fontSize: '1.2rem', fontWeight: 600, color: cell === 0 ? 'var(--cyan)' : 'var(--text1)',
-              borderRight: (c + 1) % 3 === 0 ? '2px solid var(--cyan)' : '1px solid var(--border)',
-              borderBottom: (r + 1) % 3 === 0 ? '2px solid var(--cyan)' : '1px solid var(--border)'
-            }}
-          >
-            {cell !== 0 ? cell : ''}
-          </div>
-        )))}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 30, padding: 20, width: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 20, width: '100%', maxWidth: 400 }}>
+         <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+            <label className="form-label" style={{fontSize: '.8rem'}}>DIFFICULTY</label>
+            <select 
+              className="form-input" 
+              value={difficulty} 
+              onChange={(e) => setDifficulty(e.target.value)}
+              style={{ background: 'var(--bg2)', cursor: 'pointer' }}
+            >
+              <option value="easy">Easy (Warmup)</option>
+              <option value="medium">Medium (Focus)</option>
+              <option value="hard">Hard (Genius)</option>
+            </select>
+         </div>
+         <button className="btn" onClick={() => generatePuzzle(difficulty)} style={{ alignSelf: 'flex-end', height: 45, background: 'var(--cyan-dim)', color: 'var(--cyan)' }}>
+            <i className="fas fa-rotate"></i> RESET
+         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: 10 }}>
-        {[1,2,3,4,5,6,7,8,9].map(num => (
+      <div style={{ position: 'relative' }}>
+        <div style={{ 
+          display: 'grid', gridTemplateColumns: 'repeat(6, 60px)', 
+          border: '4px solid var(--cyan)', borderRadius: 12, overflow: 'hidden',
+          boxShadow: '0 0 50px rgba(0, 243, 255, 0.15)',
+          background: 'rgba(0,0,0,0.3)'
+        }}>
+          {grid.map((row, r) => row.map((cell, c) => {
+            const isInitial = initial.includes(`${r}-${c}`)
+            const isSelected = selected[0] === r && selected[1] === c
+            return (
+              <div 
+                key={`${r}-${c}`}
+                onClick={() => handleCellClick(r, c)}
+                style={{ 
+                  width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: isInitial ? 'default' : 'pointer',
+                  background: isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent',
+                  fontSize: '1.6rem', fontWeight: 800, 
+                  color: isInitial ? 'var(--text1)' : 'var(--cyan)',
+                  borderRight: (c + 1) % 3 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)',
+                  borderBottom: (r + 1) % 2 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)',
+                  transition: 'all 0.2s',
+                  transform: isSelected ? 'scale(1.05)' : 'none',
+                  zIndex: isSelected ? 2 : 1
+                }}
+              >
+                {cell !== 0 ? cell : ''}
+              </div>
+            )
+          }))}
+        </div>
+        
+        {win && (
+          <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--emerald)', boxShadow: '0 0 40px var(--emerald-dim)' }}>
+            <i className="fas fa-trophy" style={{fontSize: '4rem', color: 'var(--yellow)', marginBottom: 20}}></i>
+            <h2 style={{color: 'var(--emerald)', fontSize: '2rem', fontWeight: 900}}>ZEN ACHIEVED!</h2>
+            <p style={{color: 'var(--text2)', marginBottom: 20}}>You solved the puzzle.</p>
+            <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)}>PLAY AGAIN</button>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+        {[1,2,3,4,5,6].map(num => (
           <button 
             key={num} 
             onClick={() => handleNumberClick(num)}
-            className="btn"
-            style={{ width: 40, height: 40, padding: 0, justifyContent: 'center', border: '1px solid var(--cyan)' }}
+            className="btn hover-glow"
+            style={{ 
+                width: 55, height: 55, borderRadius: 12, padding: 0, justifyContent: 'center', 
+                fontSize: '1.4rem', fontWeight: 800, background: 'var(--bg2)', 
+                border: '2px solid var(--cyan)', color: 'var(--cyan)' 
+            }}
           >
             {num}
           </button>
@@ -129,9 +227,9 @@ function SudokuGame() {
         <button 
           onClick={() => handleNumberClick(0)}
           className="btn"
-          style={{ width: 60, height: 40, padding: 0, justifyContent: 'center', border: '1px solid var(--red)' }}
+          style={{ width: 80, height: 55, padding: 0, justifyContent: 'center', border: '2px solid var(--red)', color: 'var(--red)', background: 'rgba(239, 68, 68, 0.1)' }}
         >
-          CLEAR
+          <i className="fas fa-eraser" style={{marginRight: 8}}></i> CLEAR
         </button>
       </div>
     </div>
