@@ -59,10 +59,13 @@ def dashboard():
             (user_id,)
         ).fetchall()
 
+        from datetime import datetime
+        today_date = datetime.now().strftime('%Y-%m-%d')
+
         assignments = db.execute(
             "SELECT * FROM assignments WHERE user_id = ? AND status = 'pending' "
-            "AND due_date >= date('now') ORDER BY due_date ASC LIMIT 5",
-            (user_id,)
+            "AND due_date >= ? ORDER BY due_date ASC LIMIT 5",
+            (user_id, today_date)
         ).fetchall()
 
         syllabus_raw = db.execute(
@@ -81,9 +84,9 @@ def dashboard():
             })
 
         reminders = db.execute(
-            "SELECT * FROM reminders WHERE user_id = ? AND date(created_at) = date('now') "
+            "SELECT * FROM reminders WHERE user_id = ? AND (created_at LIKE ? OR date(created_at) = ?) "
             "ORDER BY created_at DESC LIMIT 10",
-            (user_id,)
+            (user_id, f"{today_date}%", today_date)
         ).fetchall()
 
         total_hw   = db.execute('SELECT COUNT(*) as c FROM homework WHERE user_id = ?', (user_id,)).fetchone()['c']
@@ -145,6 +148,14 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    logger.error(f"Unhandled Exception: {str(e)}")
+    import traceback
+    logger.error(traceback.format_exc())
+    return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
 
 @app.route('/api/health', methods=['GET'])
 def health():
