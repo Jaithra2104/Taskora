@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 
-const PRESET_AVATARS = [
-  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
+const CARTOON_AVATARS = [
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Aria',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Milo',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoey',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Leo'
 ]
 
 export default function Profile() {
@@ -105,12 +105,7 @@ export default function Profile() {
     return `https://${url}`
   }
 
-  if (loading) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16 }}>
-      <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--cyan)', borderTopColor: 'transparent', animation: 'spin .8s linear infinite' }} />
-      <p style={{ color: 'var(--text2)', fontWeight: 600 }}>Syncing Profile...</p>
-    </div>
-  )
+  if (loading) return <div className="text-center mt-24">Loading Profile...</div>
 
   const profileImg = form.profile_pic ? (form.profile_pic.startsWith('http') ? form.profile_pic : `${API_BASE_URL}${form.profile_pic}`) : null
 
@@ -119,7 +114,7 @@ export default function Profile() {
       <div className="page-header">
         <div>
           <h2>Identity Hub</h2>
-          <p>Customize how the world sees you on Taskora</p>
+          <p>Customize your digital avatar and social presence</p>
         </div>
       </div>
 
@@ -129,19 +124,19 @@ export default function Profile() {
           <div className="card" style={{ border: '1px solid var(--border-cyan)', textAlign: 'center' }}>
             <div style={{ position: 'relative', width: 140, height: 140, margin: '0 auto 20px' }}>
               <div style={{ 
-                width: '100%', height: '100%', borderRadius: '50%', background: 'var(--grad-purple)', 
+                width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg2)', 
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '4rem', border: '4px solid var(--bg2)', boxShadow: 'var(--purple-glow)',
+                border: '4px solid var(--cyan)', boxShadow: 'var(--cyan-glow)',
                 overflow: 'hidden'
               }}>
-                {profileImg ? <img src={profileImg} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
+                {profileImg ? <img src={profileImg} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <i className="fas fa-user" style={{fontSize: '3rem', color: 'var(--text3)'}}></i>}
               </div>
               <button 
                 onClick={() => fileInputRef.current.click()}
                 style={{ position: 'absolute', bottom: 5, right: 5, width: 36, height: 36, borderRadius: '50%', background: 'var(--cyan)', border: 'none', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', boxShadow: '0 0 15px var(--cyan)' }}
                 title="Upload Photo"
               >
-                📸
+                <i className="fas fa-camera"></i>
               </button>
               <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleFileUpload} />
             </div>
@@ -149,15 +144,15 @@ export default function Profile() {
             <h3 style={{ fontSize: '1.6rem', fontWeight: 900 }}>{form.first_name || 'Anonymous'} {form.last_name}</h3>
             <p style={{ color: 'var(--text2)', fontSize: '.9rem', marginBottom: 20 }}>{form.email}</p>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 20 }}>
-              <a href={formatLink(form.linkedin)} target="_blank" rel="noreferrer" className="btn-icon" style={{ width: 44, height: 44, fontSize: '1.2rem' }} title="LinkedIn">
-                🔗
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 20 }}>
+              <a href={formatLink(form.linkedin)} target="_blank" rel="noreferrer" className="btn-icon" style={{ width: 44, height: 44, fontSize: '1.4rem', color: '#0077b5' }} title="LinkedIn">
+                <i className="fab fa-linkedin"></i>
               </a>
-              <a href={formatLink(form.github)} target="_blank" rel="noreferrer" className="btn-icon" style={{ width: 44, height: 44, fontSize: '1.2rem' }} title="GitHub">
-                🐙
+              <a href={formatLink(form.github)} target="_blank" rel="noreferrer" className="btn-icon" style={{ width: 44, height: 44, fontSize: '1.4rem', color: '#fff' }} title="GitHub">
+                <i className="fab fa-github"></i>
               </a>
-              <a href={`tel:${form.mobile_no}`} className="btn-icon" style={{ width: 44, height: 44, fontSize: '1.2rem' }} title="Call">
-                📱
+              <a href={`tel:${form.mobile_no}`} className="btn-icon" style={{ width: 44, height: 44, fontSize: '1.4rem', color: 'var(--emerald)' }} title="Call">
+                <i className="fas fa-phone"></i>
               </a>
             </div>
 
@@ -167,15 +162,15 @@ export default function Profile() {
           </div>
 
           <div className="card">
-            <h4 style={{ fontSize: '.9rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, color: 'var(--cyan)' }}>Quick Avatars</h4>
+            <h4 style={{ fontSize: '.9rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, color: 'var(--cyan)' }}>Choose Cartoon Avatar</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-              {PRESET_AVATARS.map((url, i) => (
+              {CARTOON_AVATARS.map((url, i) => (
                 <div 
                   key={i} 
                   onClick={() => setForm(prev => ({ ...prev, profile_pic: url }))}
                   style={{ 
                     aspectRatio: '1/1', borderRadius: 12, cursor: 'pointer', overflow: 'hidden', 
-                    border: form.profile_pic === url ? '3px solid var(--cyan)' : '2px solid transparent',
+                    background: 'var(--bg2)', border: form.profile_pic === url ? '3px solid var(--cyan)' : '2px solid var(--border)',
                     transition: 'all 0.2s', transform: form.profile_pic === url ? 'scale(1.05)' : 'none'
                   }}
                 >
@@ -211,12 +206,12 @@ export default function Profile() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">LinkedIn (Username or URL)</label>
+              <label className="form-label">LinkedIn Profile URL</label>
               <input className="form-input" value={form.linkedin} onChange={e => setForm({ ...form, linkedin: e.target.value })} placeholder="linkedin.com/in/username" />
             </div>
 
             <div className="form-group">
-              <label className="form-label">GitHub (Username or URL)</label>
+              <label className="form-label">GitHub Profile URL</label>
               <input className="form-input" value={form.github} onChange={e => setForm({ ...form, github: e.target.value })} placeholder="github.com/username" />
             </div>
 
