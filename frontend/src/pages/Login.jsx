@@ -40,7 +40,7 @@ export default function Login() {
       <div className="auth-card slide-up">
         <div className="auth-logo-wrap">📘</div>
         <h2>Welcome Back</h2>
-        <p className="subtitle">Sign in to Smart Student Companion</p>
+        <p className="subtitle">Sign in to Taskora</p>
 
         {error && <div className="error-msg">⚠ {error}</div>}
 

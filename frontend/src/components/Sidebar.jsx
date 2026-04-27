@@ -26,7 +26,7 @@ export default function Sidebar() {
       {/* Mobile header */}
       <div className="mobile-header">
         <button className="hamburger" onClick={() => setOpen(true)}>☰</button>
-        <span style={{ fontWeight: 800, fontSize: '.95rem', background: 'var(--grad-cyan)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>SSC</span>
+        <span style={{ fontWeight: 800, fontSize: '.95rem', background: 'var(--grad-cyan)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>TASKORA</span>
         <div style={{ width: 36 }} />
       </div>
 
@@ -37,8 +37,7 @@ export default function Sidebar() {
         <div className="sidebar-brand">
           <div className="sidebar-logo">📘</div>
           <div>
-            <h1>Smart Student</h1>
-            <p>Companion</p>
+            <h1>Taskora</h1>
           </div>
         </div>
 

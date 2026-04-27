@@ -163,7 +163,7 @@ def handle_exception(e):
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    return jsonify({'status': 'ok', 'message': 'Smart Student Companion API is running'}), 200
+    return jsonify({'status': 'ok', 'message': 'Taskora API is running'}), 200
 
 
 @app.route('/')
