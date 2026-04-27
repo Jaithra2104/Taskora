@@ -61,7 +61,7 @@ export default function Games() {
              <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '300px', height: '300px', background: GAMES.find(g => g.id === activeGame).color, filter: 'blur(150px)', opacity: 0.1, pointerEvents: 'none' }}></div>
              
             {activeGame === 'sudoku' && <Sudoku6x6 />}
-            {activeGame === 'chess' && <div className="text-center" style={{position: 'relative'}}><i className="fas fa-chess-knight" style={{fontSize: '5rem', color: 'var(--purple)', marginBottom: 20, filter: 'drop-shadow(0 0 15px var(--purple))'}}></i><p style={{fontSize: '1.2rem', fontWeight: 700}}>Chess Engine Loading...</p><p style={{fontSize: '.9rem', color: 'var(--text3)'}}>Multiplayer Chess Module coming soon!</p></div>}
+            {activeGame === 'chess' && <ChessGame />}
             {activeGame === 'crossword' && <div className="text-center" style={{position: 'relative'}}><i className="fas fa-font" style={{fontSize: '5rem', color: 'var(--emerald)', marginBottom: 20, filter: 'drop-shadow(0 0 15px var(--emerald))'}}></i><p style={{fontSize: '1.2rem', fontWeight: 700}}>LexiCross Daily Grid</p><p style={{fontSize: '.9rem', color: 'var(--text3)'}}>New puzzles arrive every 24 hours.</p></div>}
           </div>
         </div>
@@ -232,6 +232,106 @@ function Sudoku6x6() {
           <i className="fas fa-eraser" style={{marginRight: 8}}></i> CLEAR
         </button>
       </div>
+    </div>
+  )
+}
+
+function ChessGame() {
+  const initialBoard = [
+    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+    ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+  ]
+
+  const [board, setBoard] = useState(initialBoard)
+  const [selected, setSelected] = useState(null)
+  const [turn, setTurn] = useState('white') // 'white' or 'black'
+
+  const getPieceIcon = (piece) => {
+    if (!piece) return null
+    const color = piece === piece.toUpperCase() ? '#fff' : '#8b5cf6'
+    const type = piece.toLowerCase()
+    let icon = ''
+    switch(type) {
+      case 'r': icon = 'fa-chess-rook'; break
+      case 'n': icon = 'fa-chess-knight'; break
+      case 'b': icon = 'fa-chess-bishop'; break
+      case 'q': icon = 'fa-chess-queen'; break
+      case 'k': icon = 'fa-chess-king'; break
+      case 'p': icon = 'fa-chess-pawn'; break
+    }
+    return <i className={`fas ${icon}`} style={{ color, filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))' }}></i>
+  }
+
+  const handleCellClick = (r, c) => {
+    const piece = board[r][c]
+    
+    if (selected) {
+      // Move logic
+      const [sr, sc] = selected
+      if (sr === r && sc === c) {
+        setSelected(null)
+        return
+      }
+
+      // Very basic move execution
+      const newBoard = board.map(row => [...row])
+      newBoard[r][c] = board[sr][sc]
+      newBoard[sr][sc] = null
+      setBoard(newBoard)
+      setSelected(null)
+      setTurn(turn === 'white' ? 'black' : 'white')
+    } else {
+      if (!piece) return
+      const isWhite = piece === piece.toUpperCase()
+      if ((isWhite && turn === 'white') || (!isWhite && turn === 'black')) {
+        setSelected([r, c])
+      }
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 30, width: '100%' }}>
+      <div style={{ background: 'var(--bg2)', padding: '10px 20px', borderRadius: 12, border: '1px solid var(--purple)', boxShadow: '0 0 15px var(--purple-dim)' }}>
+        <h4 style={{ color: 'var(--purple)', margin: 0, fontSize: '1rem', fontWeight: 900 }}>
+          {turn.toUpperCase()}'S TURN
+        </h4>
+      </div>
+
+      <div style={{ 
+        display: 'grid', gridTemplateColumns: 'repeat(8, 55px)', 
+        border: '5px solid #2d1b4e', borderRadius: 10, overflow: 'hidden',
+        boxShadow: '0 0 40px rgba(139, 92, 246, 0.2)'
+      }}>
+        {board.map((row, r) => row.map((piece, c) => {
+          const isBlackCell = (r + c) % 2 === 1
+          const isSelected = selected && selected[0] === r && selected[1] === c
+          return (
+            <div 
+              key={`${r}-${c}`}
+              onClick={() => handleCellClick(r, c)}
+              style={{ 
+                width: 55, height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+                background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'),
+                fontSize: '1.8rem',
+                transition: 'all 0.1s'
+              }}
+            >
+              {getPieceIcon(piece)}
+            </div>
+          )
+        }))}
+      </div>
+
+      <button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setSelected(null)}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)' }}>
+        RESTART MATCH
+      </button>
     </div>
   )
 }
