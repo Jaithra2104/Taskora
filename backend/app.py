@@ -83,10 +83,13 @@ def dashboard():
                 'progress': round(((s['completed'] or 0) / s['total']) * 100, 1) if s['total'] > 0 else 0
             })
 
+        from datetime import timedelta
+        tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+
         reminders = db.execute(
-            "SELECT * FROM reminders WHERE user_id = ? AND (created_at LIKE ? OR date(created_at) = ?) "
+            "SELECT * FROM reminders WHERE user_id = ? AND created_at >= ? AND created_at < ? "
             "ORDER BY created_at DESC LIMIT 10",
-            (user_id, f"{today_date}%", today_date)
+            (user_id, today_date, tomorrow_date)
         ).fetchall()
 
         total_hw   = db.execute('SELECT COUNT(*) as c FROM homework WHERE user_id = ?', (user_id,)).fetchone()['c']
