@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const GAMES = [
   { id: 'sudoku', name: 'Sudoku Zen 6x6', icon: 'fa-table-cells', color: 'var(--cyan)', desc: 'Fast-paced logic training with 6x6 grids.' },
@@ -77,41 +77,33 @@ function Sudoku6x6() {
   const [invalidCells, setInvalidCells] = useState([])
   const [glowingGroups, setGlowingGroups] = useState({ rows: [], cols: [], boxes: [] })
   const [win, setWin] = useState(false)
+  const [seconds, setSeconds] = useState(0)
+  const [highScore, setHighScore] = useState(() => localStorage.getItem('sudoku_high_score') || null)
+  
+  const timerRef = useRef(null)
+
+  const formatTime = (s) => {
+    const mins = Math.floor(s / 60)
+    const secs = s % 60
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`
+  }
 
   const generatePuzzle = (diff) => {
-    // 1. Start with a guaranteed valid solved base 6x6 grid
     let solved = [
-      [1, 2, 3, 4, 5, 6],
-      [4, 5, 6, 1, 2, 3],
-      [2, 3, 1, 5, 6, 4],
-      [5, 6, 4, 2, 3, 1],
-      [3, 1, 2, 6, 4, 5],
-      [6, 4, 5, 3, 1, 2]
+      [1, 2, 3, 4, 5, 6], [4, 5, 6, 1, 2, 3], [2, 3, 1, 5, 6, 4],
+      [5, 6, 4, 2, 3, 1], [3, 1, 2, 6, 4, 5], [6, 4, 5, 3, 1, 2]
     ]
-
-    // 2. Perform valid transformations to randomize while keeping it solvable
-    // Swap rows within bands (0-1, 2-3, 4-5)
     for (let i = 0; i < 3; i++) {
         if (Math.random() > 0.5) {
-            const r1 = i * 2, r2 = i * 2 + 1
-            const temp = solved[r1]
-            solved[r1] = solved[r2]
-            solved[r2] = temp
+            const r1 = i * 2, r2 = i * 2 + 1; const temp = solved[r1]; solved[r1] = solved[r2]; solved[r2] = temp
         }
     }
-    // Swap columns within bands (0-2, 3-5)
     for (let i = 0; i < 2; i++) {
         if (Math.random() > 0.5) {
             const c1 = i * 3, c2 = i * 3 + (Math.floor(Math.random() * 2) + 1) % 3
-            for(let r=0; r<6; r++) {
-                const temp = solved[r][c1]
-                solved[r][c1] = solved[r][c2]
-                solved[r][c2] = temp
-            }
+            for(let r=0; r<6; r++) { const temp = solved[r][c1]; solved[r][c1] = solved[r][c2]; solved[r][c2] = temp }
         }
     }
-
-    // 3. Remove cells based on difficulty
     const cellsToRemove = diff === 'easy' ? 12 : (diff === 'medium' ? 18 : 24)
     const newGrid = solved.map(row => [...row])
     const initCells = []
@@ -120,13 +112,18 @@ function Sudoku6x6() {
       const r = Math.floor(Math.random() * 6), c = Math.floor(Math.random() * 6)
       if (newGrid[r][c] !== 0) { newGrid[r][c] = 0; removed++ }
     }
-
     for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] !== 0) initCells.push(`${r}-${c}`)
     
-    setGrid(newGrid); setInitial(initCells); setWin(false); setSelected([null, null]); setInvalidCells([]); setGlowingGroups({ rows: [], cols: [], boxes: [] })
+    setGrid(newGrid); setInitial(initCells); setWin(false); setSelected([null, null]); setInvalidCells([]); setGlowingGroups({ rows: [], cols: [], boxes: [] }); setSeconds(0)
+    
+    if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000)
   }
 
-  useEffect(() => generatePuzzle(difficulty), [difficulty])
+  useEffect(() => {
+    generatePuzzle(difficulty)
+    return () => clearInterval(timerRef.current)
+  }, [difficulty])
 
   const validateGrid = (newGrid) => {
     const invalid = []
@@ -171,10 +168,17 @@ function Sudoku6x6() {
     setGlowingGroups(newGlow)
     setTimeout(() => setGlowingGroups({ rows: [], cols: [], boxes: [] }), 1500)
 
-    if (newGlow.rows.length + newGlow.cols.length + newGlow.boxes.length > 0) {
-        let filled = true
-        for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] === 0) filled = false
-        if (filled && invalid.length === 0) setWin(true)
+    let filled = true
+    for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] === 0) filled = false
+    
+    if (filled && invalid.length === 0) {
+      setWin(true)
+      clearInterval(timerRef.current)
+      // Check High Score
+      if (!highScore || seconds < parseInt(highScore)) {
+        localStorage.setItem('sudoku_high_score', seconds.toString())
+        setHighScore(seconds.toString())
+      }
     }
   }
 
@@ -195,7 +199,20 @@ function Sudoku6x6() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 30, padding: 20, width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, padding: 20, width: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: 500, background: 'rgba(0,0,0,0.3)', padding: '15px 25px', borderRadius: 15, border: '1px solid var(--border)' }}>
+          <div style={{textAlign: 'center'}}>
+            <div style={{fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800}}>CURRENT TIME</div>
+            <div style={{fontSize: '1.4rem', fontWeight: 900, color: 'var(--cyan)'}}>{formatTime(seconds)}</div>
+          </div>
+          <div style={{textAlign: 'center'}}>
+            <div style={{fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800}}>PERSONAL BEST</div>
+            <div style={{fontSize: '1.4rem', fontWeight: 900, color: 'var(--yellow)'}}>
+              {highScore ? formatTime(parseInt(highScore)) : '--:--'}
+            </div>
+          </div>
+      </div>
+
       <div style={{ display: 'flex', justifyContent: 'center', gap: 20, width: '100%', maxWidth: 400 }}>
          <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
             <label className="form-label" style={{fontSize: '.8rem'}}>DIFFICULTY</label>
@@ -225,7 +242,8 @@ function Sudoku6x6() {
           <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--emerald)', boxShadow: '0 0 40px var(--emerald-dim)' }}>
             <i className="fas fa-trophy" style={{fontSize: '4rem', color: 'var(--yellow)', marginBottom: 20}}></i>
             <h2 style={{color: 'var(--emerald)', fontSize: '2rem', fontWeight: 900}}>ZEN ACHIEVED!</h2>
-            <p style={{color: 'var(--text2)', marginBottom: 20}}>You solved the puzzle.</p>
+            <p style={{color: '#fff', marginBottom: 5}}>Time Taken: {formatTime(seconds)}</p>
+            {seconds === parseInt(highScore) && <p style={{color: 'var(--yellow)', fontWeight: 800, marginBottom: 20}}>✨ NEW PERSONAL BEST! ✨</p>}
             <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)}>PLAY AGAIN</button>
           </div>
         )}
@@ -252,162 +270,60 @@ function ChessGame() {
     [null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null],
     ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
   ]
-
-  const [board, setBoard] = useState(initialBoard)
-  const [selected, setSelected] = useState(null)
-  const [turn, setTurn] = useState('white')
-  const [validMoves, setValidMoves] = useState([])
-  const [capturedWhite, setCapturedWhite] = useState([])
-  const [capturedBlack, setCapturedBlack] = useState([])
-  const [gameOver, setGameOver] = useState(null)
-
-  const isWhitePiece = (piece) => piece && piece === piece.toUpperCase()
-  const isBlackPiece = (piece) => piece && piece === piece.toLowerCase()
-
+  const [board, setBoard] = useState(initialBoard); const [selected, setSelected] = useState(null); const [turn, setTurn] = useState('white'); const [validMoves, setValidMoves] = useState([]); const [capturedWhite, setCapturedWhite] = useState([]); const [capturedBlack, setCapturedBlack] = useState([]); const [gameOver, setGameOver] = useState(null)
+  const isWhitePiece = (piece) => piece && piece === piece.toUpperCase(); const isBlackPiece = (piece) => piece && piece === piece.toLowerCase()
   const getValidMoves = (r, c, b) => {
-    const piece = b[r][c]
-    if (!piece) return []
-    const type = piece.toLowerCase(), isWhite = isWhitePiece(piece), moves = []
+    const piece = b[r][c]; if (!piece) return []; const type = piece.toLowerCase(), isWhite = isWhitePiece(piece), moves = []
     const addMove = (nr, nc) => {
       if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-        const target = b[nr][nc]
-        if (!target || (isWhite ? isBlackPiece(target) : isWhitePiece(target))) {
-          moves.push(`${nr}-${nc}`); return !target
-        }
+        const target = b[nr][nc]; if (!target || (isWhite ? isBlackPiece(target) : isWhitePiece(target))) { moves.push(`${nr}-${nc}`); return !target }
       }
       return false
     }
     if (type === 'p') {
       const dir = isWhite ? -1 : 1, startRow = isWhite ? 6 : 1
-      if (b[r + dir] && !b[r + dir][c]) {
-        moves.push(`${r + dir}-${c}`)
-        if (r === startRow && !b[r + 2 * dir][c]) moves.push(`${r + 2 * dir}-${c}`)
-      }
-      [c - 1, c + 1].forEach(nc => {
-        if (nc >= 0 && nc < 8 && b[r + dir] && b[r + dir][nc]) {
-          const target = b[r + dir][nc]
-          if (isWhite ? isBlackPiece(target) : isWhitePiece(target)) moves.push(`${r + dir}-${nc}`)
-        }
-      })
-    } else if (type === 'n') {
-      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => addMove(r + dr, c + dc))
-    } else if (type === 'r' || type === 'q') {
-      [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([dr, dc]) => {
-        let nr = r + dr, nc = c + dc; while (addMove(nr, nc)) { nr += dr; nc += dc }
-      })
-    }
-    if (type === 'b' || type === 'q') {
-      [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([dr, dc]) => {
-        let nr = r + dr, nc = c + dc; while (addMove(nr, nc)) { nr += dr; nc += dc }
-      })
-    } else if (type === 'k') {
-      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) if (dr !== 0 || dc !== 0) addMove(r + dr, c + dc)
-    }
+      if (b[r + dir] && !b[r + dir][c]) { moves.push(`${r + dir}-${c}`); if (r === startRow && !b[r + 2 * dir][c]) moves.push(`${r + 2 * dir}-${c}`) }
+      [c - 1, c + 1].forEach(nc => { if (nc >= 0 && nc < 8 && b[r + dir] && b[r + dir][nc]) { const target = b[r + dir][nc]; if (isWhite ? isBlackPiece(target) : isWhitePiece(target)) moves.push(`${r + dir}-${nc}`) } })
+    } else if (type === 'n') [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => addMove(r + dr, c + dc))
+    else if (type === 'r' || type === 'q') [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([dr, dc]) => { let nr = r + dr, nc = c + dc; while (addMove(nr, nc)) { nr += dr; nc += dc } })
+    if (type === 'b' || type === 'q') [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([dr, dc]) => { let nr = r + dr, nc = c + dc; while (addMove(nr, nc)) { nr += dr; nc += dc } })
+    else if (type === 'k') for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) if (dr !== 0 || dc !== 0) addMove(r + dr, c + dc)
     return moves
   }
-
   const makeMove = (sr, sc, tr, tc) => {
-    if (gameOver) return
-    const target = board[tr][tc]
-    if (target) {
-      if (isWhitePiece(target)) setCapturedWhite(prev => [...prev, target])
-      else setCapturedBlack(prev => [...prev, target])
-      if (target.toLowerCase() === 'k') setGameOver(isWhitePiece(target) ? 'black' : 'white')
-    }
-    const newBoard = board.map(row => [...row])
-    newBoard[tr][tc] = board[sr][sc]; newBoard[sr][sc] = null
-    setBoard(newBoard); setTurn(turn === 'white' ? 'black' : 'white'); setSelected(null); setValidMoves([])
+    if (gameOver) return; const target = board[tr][tc]
+    if (target) { if (isWhitePiece(target)) setCapturedWhite(prev => [...prev, target]); else setCapturedBlack(prev => [...prev, target]); if (target.toLowerCase() === 'k') setGameOver(isWhitePiece(target) ? 'black' : 'white') }
+    const newBoard = board.map(row => [...row]); newBoard[tr][tc] = board[sr][sc]; newBoard[sr][sc] = null; setBoard(newBoard); setTurn(turn === 'white' ? 'black' : 'white'); setSelected(null); setValidMoves([])
   }
-
   useEffect(() => {
     if (turn === 'black' && !gameOver) {
       setTimeout(() => {
-        const allMoves = []
-        for (let r = 0; r < 8; r++) {
-          for (let c = 0; c < 8; c++) {
-            const p = board[r][c]
-            if (p && isBlackPiece(p)) {
-              const ms = getValidMoves(r, c, board)
-              ms.forEach(m => allMoves.push({ s: [r, c], t: m.split('-').map(Number) }))
-            }
-          }
-        }
-        if (allMoves.length > 0) {
-          const move = allMoves[Math.floor(Math.random() * allMoves.length)]
-          makeMove(move.s[0], move.s[1], move.t[0], move.t[1])
-        }
+        const allMoves = []; for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = board[r][c]; if (p && isBlackPiece(p)) { const ms = getValidMoves(r, c, board); ms.forEach(m => allMoves.push({ s: [r, c], t: m.split('-').map(Number) })) } }
+        if (allMoves.length > 0) { const move = allMoves[Math.floor(Math.random() * allMoves.length)]; makeMove(move.s[0], move.s[1], move.t[0], move.t[1]) }
       }, 800)
     }
   }, [turn, gameOver])
-
   const handleCellClick = (r, c) => {
-    if (turn !== 'white' || gameOver) return
-    const piece = board[r][c]
-    if (selected) {
-      if (validMoves.includes(`${r}-${c}`)) makeMove(selected[0], selected[1], r, c)
-      else { setSelected(null); setValidMoves([]) }
-    } else if (piece && isWhitePiece(piece)) {
-      setSelected([r, c]); setValidMoves(getValidMoves(r, c, board))
-    }
+    if (turn !== 'white' || gameOver) return; const piece = board[r][c]
+    if (selected) { if (validMoves.includes(`${r}-${c}`)) makeMove(selected[0], selected[1], r, c); else { setSelected(null); setValidMoves([]) } }
+    else if (piece && isWhitePiece(piece)) { setSelected([r, c]); setValidMoves(getValidMoves(r, c, board)) }
   }
-
   const getPieceIcon = (piece, size = '1.8rem', colorOverride = null) => {
-    if (!piece) return null
-    const color = colorOverride || (piece === piece.toUpperCase() ? '#fff' : '#8b5cf6')
-    const type = piece.toLowerCase()
-    let icon = ''
-    switch(type) {
-      case 'r': icon = 'fa-chess-rook'; break; case 'n': icon = 'fa-chess-knight'; break
-      case 'b': icon = 'fa-chess-bishop'; break; case 'q': icon = 'fa-chess-queen'; break
-      case 'k': icon = 'fa-chess-king'; break; case 'p': icon = 'fa-chess-pawn'; break
-    }
+    if (!piece) return null; const color = colorOverride || (piece === piece.toUpperCase() ? '#fff' : '#8b5cf6'), type = piece.toLowerCase()
+    let icon = ''; switch(type) { case 'r': icon = 'fa-chess-rook'; break; case 'n': icon = 'fa-chess-knight'; break; case 'b': icon = 'fa-chess-bishop'; break; case 'q': icon = 'fa-chess-queen'; break; case 'k': icon = 'fa-chess-king'; break; case 'p': icon = 'fa-chess-pawn'; break }
     return <i className={`fas ${icon}`} style={{ color, filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))', fontSize: size }}></i>
   }
-
   const CapturedArea = ({ pieces, title }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 60, alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: 10, borderRadius: 12, border: '1px solid var(--border)' }}>
       <div style={{ fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800 }}>{title}</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 400, flexWrap: 'wrap' }}>
-        {pieces.map((p, i) => <div key={i}>{getPieceIcon(p, '1.2rem')}</div>)}
-      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 400, flexWrap: 'wrap' }}>{pieces.map((p, i) => <div key={i}>{getPieceIcon(p, '1.2rem')}</div>)}</div>
     </div>
   )
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 20 }}>
-      <div style={{ display: 'flex', gap: 20, alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: 40, border: '1px solid var(--purple)' }}>
-        <div style={{ color: turn === 'white' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'white' ? '0 0 10px var(--purple)' : 'none' }}>PLAYER</div>
-        <div style={{ color: 'var(--text3)' }}>VS</div>
-        <div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI</div>
-      </div>
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-        <CapturedArea pieces={capturedWhite} title="LOST" />
-        <div style={{ position: 'relative' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 55px)', border: '5px solid #2d1b4e', borderRadius: 10, overflow: 'hidden', boxShadow: '0 0 40px rgba(139, 92, 246, 0.2)' }}>
-            {board.map((row, r) => row.map((piece, c) => {
-              const isBlackCell = (r + c) % 2 === 1, isSelected = selected && selected[0] === r && selected[1] === c, isValid = validMoves.includes(`${r}-${c}`)
-              return (
-                <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 55, height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'), fontSize: '1.8rem', position: 'relative' }}>
-                  {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>}
-                  {getPieceIcon(piece)}
-                </div>
-              )
-            }))}
-          </div>
-          {gameOver && (
-            <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 12, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 50px var(--purple-dim)' }}>
-              <i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i>
-              <h2 style={{color: '#fff', fontSize: '2.2rem', fontWeight: 900}}>{gameOver === 'white' ? 'VICTORY!' : 'GAME OVER'}</h2>
-              <p style={{color: 'var(--text2)', marginBottom: 20}}>{gameOver === 'white' ? 'You defeated the Taskora AI.' : 'The AI has claimed your kingdom.'}</p>
-              <button className="btn btn-primary" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}}>REMATCH</button>
-            </div>
-          )}
-        </div>
-        <CapturedArea pieces={capturedBlack} title="ENEMY LOST" />
-      </div>
-      <button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}>
-        <i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD
-      </button>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: 40, border: '1px solid var(--purple)' }}><div style={{ color: turn === 'white' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'white' ? '0 0 10px var(--purple)' : 'none' }}>PLAYER</div><div style={{ color: 'var(--text3)' }}>VS</div><div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI</div></div>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}><CapturedArea pieces={capturedWhite} title="LOST" /><div style={{ position: 'relative' }}><div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 55px)', border: '5px solid #2d1b4e', borderRadius: 10, overflow: 'hidden', boxShadow: '0 0 40px rgba(139, 92, 246, 0.2)' }}>{board.map((row, r) => row.map((piece, c) => { const isBlackCell = (r + c) % 2 === 1, isSelected = selected && selected[0] === r && selected[1] === c, isValid = validMoves.includes(`${r}-${c}`); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 55, height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'), fontSize: '1.8rem', position: 'relative' }}> {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>} {getPieceIcon(piece)} </div> ) }))}</div>{gameOver && ( <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 12, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 50px var(--purple-dim)' }}><i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.2rem', fontWeight: 900}}>{gameOver === 'white' ? 'VICTORY!' : 'GAME OVER'}</h2><p style={{color: 'var(--text2)', marginBottom: 20}}>{gameOver === 'white' ? 'You defeated the Taskora AI.' : 'The AI has claimed your kingdom.'}</p><button className="btn btn-primary" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}}>REMATCH</button></div> )}</div><CapturedArea pieces={capturedBlack} title="ENEMY LOST" /></div>
+      <button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}><i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD</button>
     </div>
   )
 }
