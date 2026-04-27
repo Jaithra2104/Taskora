@@ -37,21 +37,7 @@ export default function Login() {
 
   return (
     <div className="auth-container">
-      <div className="auth-bg-shapes">
-        <div className="shape shape-1"></div>
-        <div className="shape shape-2"></div>
-        <div className="shape shape-3"></div>
-      </div>
-
       <div className="auth-card slide-up">
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-          <div className="icon-cycle">
-            <span className="icon-item">🖋️</span>
-            <span className="icon-item">📅</span>
-            <span className="icon-item">🏅</span>
-          </div>
-        </div>
-
         <div className="auth-logo-wrap">📘</div>
         <h2>Welcome Back</h2>
         <p className="subtitle">Sign in to Taskora</p>
@@ -59,42 +45,26 @@ export default function Login() {
         {error && <div className="error-msg">⚠ {error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <div className="auth-input-group">
-            <input
-              type="email"
-              className="form-input"
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-            />
-            <label>Email Address</label>
+          <div className="form-group">
+            <label className="form-label">Email Address</label>
+            <input className="form-input" type="email" name="user_email_unique" placeholder="you@email.com" required
+              autoComplete="new-password"
+              value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
           </div>
-
-          <div className="auth-input-group">
-            <input
-              type="password"
-              className="form-input"
-              placeholder="Password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-            />
-            <label>Password</label>
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <input className="form-input" type="password" name="user_password_unique" placeholder="••••••••" required
+              autoComplete="new-password"
+              value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
           </div>
-
-          <button className="btn btn-primary w-full" style={{ justifyContent: 'center', height: 46 }} disabled={loading}>
-            {loading ? (
-              <div className="book-loader">
-                <div className="book-back"></div>
-                <div className="book-page"></div>
-              </div>
-            ) : 'Sign In'}
+          <button className="btn btn-primary w-full" disabled={loading}
+            style={{ justifyContent: 'center', marginTop: 8, padding: '12px' }}>
+            {loading ? 'Signing in...' : 'Sign In →'}
           </button>
         </form>
 
         <div className="auth-footer">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
+          No account? <Link to="/signup">Create one free</Link>
         </div>
       </div>
     </div>
