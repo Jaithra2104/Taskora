@@ -79,20 +79,50 @@ function Sudoku6x6() {
   const [win, setWin] = useState(false)
 
   const generatePuzzle = (diff) => {
-    const base = [
-      [1, 2, 3, 4, 5, 6], [4, 5, 6, 1, 2, 3], [2, 3, 1, 5, 6, 4],
-      [5, 6, 4, 2, 3, 1], [3, 1, 2, 6, 4, 5], [6, 4, 5, 3, 1, 2]
+    // 1. Start with a guaranteed valid solved base 6x6 grid
+    let solved = [
+      [1, 2, 3, 4, 5, 6],
+      [4, 5, 6, 1, 2, 3],
+      [2, 3, 1, 5, 6, 4],
+      [5, 6, 4, 2, 3, 1],
+      [3, 1, 2, 6, 4, 5],
+      [6, 4, 5, 3, 1, 2]
     ]
-    const shuffled = [...base].sort(() => Math.random() - 0.5)
+
+    // 2. Perform valid transformations to randomize while keeping it solvable
+    // Swap rows within bands (0-1, 2-3, 4-5)
+    for (let i = 0; i < 3; i++) {
+        if (Math.random() > 0.5) {
+            const r1 = i * 2, r2 = i * 2 + 1
+            const temp = solved[r1]
+            solved[r1] = solved[r2]
+            solved[r2] = temp
+        }
+    }
+    // Swap columns within bands (0-2, 3-5)
+    for (let i = 0; i < 2; i++) {
+        if (Math.random() > 0.5) {
+            const c1 = i * 3, c2 = i * 3 + (Math.floor(Math.random() * 2) + 1) % 3
+            for(let r=0; r<6; r++) {
+                const temp = solved[r][c1]
+                solved[r][c1] = solved[r][c2]
+                solved[r][c2] = temp
+            }
+        }
+    }
+
+    // 3. Remove cells based on difficulty
     const cellsToRemove = diff === 'easy' ? 12 : (diff === 'medium' ? 18 : 24)
-    const newGrid = shuffled.map(row => [...row])
+    const newGrid = solved.map(row => [...row])
     const initCells = []
     let removed = 0
     while (removed < cellsToRemove) {
       const r = Math.floor(Math.random() * 6), c = Math.floor(Math.random() * 6)
       if (newGrid[r][c] !== 0) { newGrid[r][c] = 0; removed++ }
     }
+
     for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] !== 0) initCells.push(`${r}-${c}`)
+    
     setGrid(newGrid); setInitial(initCells); setWin(false); setSelected([null, null]); setInvalidCells([]); setGlowingGroups({ rows: [], cols: [], boxes: [] })
   }
 
@@ -102,68 +132,46 @@ function Sudoku6x6() {
     const invalid = []
     const newGlow = { rows: [], cols: [], boxes: [] }
 
-    // Check Rows
     for (let r = 0; r < 6; r++) {
       const counts = {}, vals = []
       for (let c = 0; c < 6; c++) {
         const val = newGrid[r][c]
-        if (val !== 0) {
-          counts[val] = (counts[val] || 0) + 1
-          vals.push(val)
-        }
+        if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
       }
       if (new Set(vals).size === 6) newGlow.rows.push(r)
-      for (let c = 0; c < 6; c++) {
-        if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
-      }
+      for (let c = 0; c < 6; c++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
     }
 
-    // Check Cols
     for (let c = 0; c < 6; c++) {
       const counts = {}, vals = []
       for (let r = 0; r < 6; r++) {
         const val = newGrid[r][c]
-        if (val !== 0) {
-          counts[val] = (counts[val] || 0) + 1
-          vals.push(val)
-        }
+        if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
       }
       if (new Set(vals).size === 6) newGlow.cols.push(c)
-      for (let r = 0; r < 6; r++) {
-        if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
-      }
+      for (let r = 0; r < 6; r++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
     }
 
-    // Check Boxes (2x3)
     for (let b = 0; b < 6; b++) {
-      const rStart = Math.floor(b / 2) * 2
-      const cStart = (b % 2) * 3
+      const rStart = Math.floor(b / 2) * 2, cStart = (b % 2) * 3
       const counts = {}, vals = []
       for (let r = rStart; r < rStart + 2; r++) {
         for (let c = cStart; c < cStart + 3; c++) {
           const val = newGrid[r][c]
-          if (val !== 0) {
-            counts[val] = (counts[val] || 0) + 1
-            vals.push(val)
-          }
+          if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
         }
       }
       if (new Set(vals).size === 6) newGlow.boxes.push(b)
       for (let r = rStart; r < rStart + 2; r++) {
-        for (let c = cStart; c < cStart + 3; c++) {
-          if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
-        }
+        for (let c = cStart; c < cStart + 3; c++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
       }
     }
 
     setInvalidCells([...new Set(invalid)])
     setGlowingGroups(newGlow)
-    
-    // Clear glow after 1.5s
     setTimeout(() => setGlowingGroups({ rows: [], cols: [], boxes: [] }), 1500)
 
     if (newGlow.rows.length + newGlow.cols.length + newGlow.boxes.length > 0) {
-        // Only win if entire grid is filled and valid
         let filled = true
         for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] === 0) filled = false
         if (filled && invalid.length === 0) setWin(true)
@@ -171,7 +179,6 @@ function Sudoku6x6() {
   }
 
   const handleCellClick = (r, c) => !initial.includes(`${r}-${c}`) && setSelected([r, c])
-  
   const handleNumberClick = (num) => {
     if (selected[0] !== null) {
       const newGrid = grid.map(row => [...row])
@@ -184,8 +191,7 @@ function Sudoku6x6() {
     if (glowingGroups.rows.includes(r)) return true
     if (glowingGroups.cols.includes(c)) return true
     const b = Math.floor(r / 2) * 2 + Math.floor(c / 3)
-    if (glowingGroups.boxes.includes(b)) return true
-    return false
+    return glowingGroups.boxes.includes(b)
   }
 
   return (
@@ -207,28 +213,9 @@ function Sudoku6x6() {
       <div style={{ position: 'relative' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 60px)', border: '4px solid var(--cyan)', borderRadius: 12, overflow: 'hidden', boxShadow: '0 0 50px rgba(0, 243, 255, 0.15)', background: 'rgba(0,0,0,0.3)' }}>
           {grid.map((row, r) => row.map((cell, c) => {
-            const isInitial = initial.includes(`${r}-${c}`)
-            const isSelected = selected[0] === r && selected[1] === c
-            const isInvalid = invalidCells.includes(`${r}-${c}`)
-            const isGlowing = isCellInGlowingGroup(r, c)
-            
+            const isInitial = initial.includes(`${r}-${c}`), isSelected = selected[0] === r && selected[1] === c, isInvalid = invalidCells.includes(`${r}-${c}`), isGlowing = isCellInGlowingGroup(r, c)
             return (
-              <div 
-                key={`${r}-${c}`} 
-                onClick={() => handleCellClick(r, c)} 
-                style={{ 
-                    width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                    cursor: isInitial ? 'default' : 'pointer', 
-                    background: isInvalid ? 'rgba(239, 68, 68, 0.4)' : (isGlowing ? 'rgba(0, 243, 255, 0.4)' : (isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent')), 
-                    fontSize: '1.6rem', fontWeight: 800, 
-                    color: isInvalid ? 'var(--red)' : (isInitial ? 'var(--text1)' : 'var(--cyan)'), 
-                    borderRight: (c + 1) % 3 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', 
-                    borderBottom: (r + 1) % 2 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', 
-                    transition: 'all 0.3s', 
-                    transform: isSelected || isGlowing ? 'scale(1.05)' : 'none', 
-                    boxShadow: isGlowing ? '0 0 20px var(--cyan)' : 'none',
-                    zIndex: isSelected || isGlowing ? 2 : 1 
-                }}>
+              <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isInitial ? 'default' : 'pointer', background: isInvalid ? 'rgba(239, 68, 68, 0.4)' : (isGlowing ? 'rgba(0, 243, 255, 0.4)' : (isSelected ? 'rgba(0, 243, 255, 0.2)' : 'transparent')), fontSize: '1.6rem', fontWeight: 800, color: isInvalid ? 'var(--red)' : (isInitial ? 'var(--text1)' : 'var(--cyan)'), borderRight: (c + 1) % 3 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', borderBottom: (r + 1) % 2 === 0 ? '3px solid var(--cyan)' : '1px solid var(--border)', transition: 'all 0.3s', transform: isSelected || isGlowing ? 'scale(1.05)' : 'none', boxShadow: isGlowing ? '0 0 20px var(--cyan)' : 'none', zIndex: isSelected || isGlowing ? 2 : 1 }}>
                 {cell !== 0 ? cell : ''}
               </div>
             )
