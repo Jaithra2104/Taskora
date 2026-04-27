@@ -13,6 +13,7 @@ from routes.syllabus import syllabus_bp
 from routes.study import study_bp
 from services.scheduler import init_scheduler
 
+# Version: 1.0.3 - Force Redeploy for SQL Fix
 app = Flask(__name__)
 app.config.from_object(Config)
 
