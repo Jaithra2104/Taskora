@@ -142,9 +142,13 @@ def health():
     return jsonify({'status': 'ok', 'message': 'Smart Student Companion API is running'}), 200
 
 
-if __name__ == '__main__':
+# Initialize DB and Scheduler on startup
+with app.app_context():
     os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
     init_db()
     init_scheduler()
+
+
+if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
