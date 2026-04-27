@@ -12,6 +12,7 @@ import Syllabus from './pages/Syllabus'
 import StudyAssistant from './pages/StudyAssistant'
 
 import Profile from './pages/Profile'
+import Games from './pages/Games'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -44,6 +45,7 @@ function AppRoutes() {
       <Route path="/syllabus" element={<ProtectedRoute><AppLayout><Syllabus /></AppLayout></ProtectedRoute>} />
       <Route path="/study" element={<ProtectedRoute><AppLayout><StudyAssistant /></AppLayout></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
+      <Route path="/games" element={<ProtectedRoute><AppLayout><Games /></AppLayout></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )

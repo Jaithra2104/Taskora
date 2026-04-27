@@ -3,14 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const NAV = [
-  { path: '/', label: 'Dashboard', icon: '⊞' },
-  { path: '/timetable', label: 'Timetable', icon: '◫' },
-  { path: '/homework', label: 'Homework', icon: '✎' },
-  { path: '/assignments', label: 'Assignments', icon: '⏰' },
-  { path: '/certificates', label: 'Certificates', icon: '✦' },
-  { path: '/syllabus', label: 'Syllabus', icon: '◉' },
-  { path: '/study', label: 'Study Assistant', icon: '⬡' },
-  { path: '/profile', label: 'My Profile', icon: '👤' },
+  { path: '/', label: 'Dashboard', icon: 'fa-house' },
+  { path: '/timetable', label: 'Timetable', icon: 'fa-calendar-days' },
+  { path: '/homework', label: 'Homework', icon: 'fa-book-open' },
+  { path: '/assignments', label: 'Assignments', icon: 'fa-clock' },
+  { path: '/certificates', label: 'Certificates', icon: 'fa-award' },
+  { path: '/syllabus', label: 'Syllabus', icon: 'fa-scroll' },
+  { path: '/study', label: 'Study Assistant', icon: 'fa-brain' },
+  { path: '/games', label: 'Arcade', icon: 'fa-gamepad' },
+  { path: '/profile', label: 'My Profile', icon: 'fa-user-astronaut' },
 ]
 
 export default function Sidebar() {
@@ -51,7 +52,7 @@ export default function Sidebar() {
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
               onClick={() => go(item.path)}
             >
-              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-icon"><i className={`fas ${item.icon}`}></i></span>
               {item.label}
               {location.pathname === item.path && (
                 <span style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: 'var(--cyan)', boxShadow: '0 0 8px var(--cyan)' }} />
