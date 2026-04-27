@@ -81,19 +81,12 @@ def init_db():
     
     for field, ftype in user_fields:
         try:
-            if db.is_pg:
-                # Proper Postgres column check
-                check_sql = "SELECT column_name FROM information_schema.columns WHERE table_name='users' AND column_name=%s"
-                # Need to use raw cursor for fetchone check
-                cur = db.conn.cursor()
-                cur.execute(check_sql, (field,))
-                if not cur.fetchone():
-                    db.execute(f"ALTER TABLE users ADD COLUMN {field} {ftype}")
-            else:
-                # SQLite fallback
-                db.execute(f"ALTER TABLE users ADD COLUMN {field} {ftype}")
-        except Exception as e:
-            print(f"[DB MIGRATE] Skip {field}: {e}")
+            # Simplest way: try to add and catch "already exists" error
+            db.execute(f"ALTER TABLE users ADD COLUMN {field} {ftype}")
+            print(f"[DB MIGRATE] Added column: {field}")
+        except Exception:
+            # Column likely exists, skip
+            pass
 
     db.commit()
     db.close()

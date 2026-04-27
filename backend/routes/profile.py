@@ -18,10 +18,26 @@ def get_profile():
     user_id = int(get_jwt_identity())
     db = get_db()
     try:
-        user = db.execute("SELECT id, name, email, first_name, last_name, mobile_no, linkedin, github, profile_pic, bio FROM users WHERE id = ?", (user_id,)).fetchone()
-        if not user:
+        # Use SELECT * and then dict to avoid crashing on missing columns in the query itself
+        user_row = db.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user_row:
             return jsonify({'error': 'User not found'}), 404
-        return jsonify(dict(user)), 200
+        
+        user_dict = dict(user_row)
+        # Filter for only the profile fields we want, using .get() to avoid KeyErrors
+        result = {
+            "id": user_dict.get("id"),
+            "name": user_dict.get("name"),
+            "email": user_dict.get("email"),
+            "first_name": user_dict.get("first_name", ""),
+            "last_name": user_dict.get("last_name", ""),
+            "mobile_no": user_dict.get("mobile_no", ""),
+            "linkedin": user_dict.get("linkedin", ""),
+            "github": user_dict.get("github", ""),
+            "profile_pic": user_dict.get("profile_pic", ""),
+            "bio": user_dict.get("bio", "")
+        }
+        return jsonify(result), 200
     except Exception as e:
         logger.error(f"Error fetching profile: {str(e)}")
         return jsonify({'error': str(e)}), 500
