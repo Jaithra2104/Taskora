@@ -38,9 +38,12 @@ export default function Profile() {
             profile_pic: data.profile_pic || '',
             bio: data.bio || ''
           })
+        } else {
+          const data = await res.json()
+          setError(data.error || 'Identity Sync failed')
         }
       } catch (err) {
-        setError('Failed to load profile details')
+        setError('Network Error: Could not connect to Taskora Engine')
       } finally {
         setLoading(false)
       }
