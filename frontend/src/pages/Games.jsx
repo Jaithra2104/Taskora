@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 const GAMES = [
   { id: 'sudoku', name: 'Sudoku Zen 6x6', icon: 'fa-table-cells', color: 'var(--cyan)', desc: 'Fast-paced logic training with 6x6 grids.' },
-  { id: 'chess', name: 'Grandmaster Chess', icon: 'fa-chess', color: 'var(--purple)', desc: 'Strategic mastery for the sharpest minds.' },
+  { id: 'chess', name: 'Grandmaster Chess', icon: 'fa-chess', color: 'var(--purple)', desc: 'Strategic mastery against a computer opponent.' },
   { id: 'crossword', name: 'LexiCross', icon: 'fa-font', color: 'var(--emerald)', desc: 'Boost your vocabulary with daily word grids.' }
 ]
 
@@ -78,7 +78,6 @@ function Sudoku6x6() {
   const [win, setWin] = useState(false)
 
   const generatePuzzle = (diff) => {
-    // Basic 6x6 Sudoku Generator logic (simplified for demonstration)
     const base = [
       [1, 2, 3, 4, 5, 6],
       [4, 5, 6, 1, 2, 3],
@@ -87,14 +86,10 @@ function Sudoku6x6() {
       [3, 1, 2, 6, 4, 5],
       [6, 4, 5, 3, 1, 2]
     ]
-    // Randomize slightly
     const shuffled = [...base].sort(() => Math.random() - 0.5)
-    
-    // Remove cells based on difficulty
     const cellsToRemove = diff === 'easy' ? 12 : (diff === 'medium' ? 18 : 24)
     const newGrid = shuffled.map(row => [...row])
     const initCells = []
-    
     let removed = 0
     while (removed < cellsToRemove) {
       const r = Math.floor(Math.random() * 6)
@@ -104,13 +99,11 @@ function Sudoku6x6() {
         removed++
       }
     }
-
     for(let r=0; r<6; r++) {
       for(let c=0; c<6; c++) {
         if(newGrid[r][c] !== 0) initCells.push(`${r}-${c}`)
       }
     }
-
     setGrid(newGrid)
     setInitial(initCells)
     setWin(false)
@@ -136,7 +129,6 @@ function Sudoku6x6() {
   }
 
   const checkWin = (currentGrid) => {
-    // Very simple check: no zeros
     for (let r = 0; r < 6; r++) {
       for (let c = 0; c < 6; c++) {
         if (currentGrid[r][c] === 0) return
@@ -250,7 +242,119 @@ function ChessGame() {
 
   const [board, setBoard] = useState(initialBoard)
   const [selected, setSelected] = useState(null)
-  const [turn, setTurn] = useState('white') // 'white' or 'black'
+  const [turn, setTurn] = useState('white')
+  const [validMoves, setValidMoves] = useState([])
+
+  const isWhitePiece = (piece) => piece === piece.toUpperCase()
+  const isBlackPiece = (piece) => piece === piece.toLowerCase()
+
+  const getValidMoves = (r, c, b) => {
+    const piece = b[r][c]
+    if (!piece) return []
+    const type = piece.toLowerCase()
+    const isWhite = isWhitePiece(piece)
+    const moves = []
+
+    const addMove = (nr, nc) => {
+      if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+        const target = b[nr][nc]
+        if (!target || (isWhite ? isBlackPiece(target) : isWhitePiece(target))) {
+          moves.push(`${nr}-${nc}`)
+          return !target // Continue if target was empty
+        }
+      }
+      return false
+    }
+
+    if (type === 'p') {
+      const dir = isWhite ? -1 : 1
+      const startRow = isWhite ? 6 : 1
+      // Forward
+      if (b[r + dir] && !b[r + dir][c]) {
+        moves.push(`${r + dir}-${c}`)
+        if (r === startRow && !b[r + 2 * dir][c]) moves.push(`${r + 2 * dir}-${c}`)
+      }
+      // Captures
+      [c - 1, c + 1].forEach(nc => {
+        if (nc >= 0 && nc < 8 && b[r + dir] && b[r + dir][nc]) {
+          const target = b[r + dir][nc]
+          if (isWhite ? isBlackPiece(target) : isWhitePiece(target)) moves.push(`${r + dir}-${nc}`)
+        }
+      })
+    } else if (type === 'n') {
+      const diffs = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
+      diffs.forEach(([dr, dc]) => addMove(r + dr, c + dc))
+    } else if (type === 'r' || type === 'q') {
+      [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([dr, dc]) => {
+        let nr = r + dr, nc = c + dc
+        while (addMove(nr, nc)) { nr += dr; nc += dc }
+      })
+    }
+    if (type === 'b' || type === 'q') {
+      [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([dr, dc]) => {
+        let nr = r + dr, nc = c + dc
+        while (addMove(nr, nc)) { nr += dr; nc += dc }
+      })
+    } else if (type === 'k') {
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) continue
+          addMove(r + dr, c + dc)
+        }
+      }
+    }
+    return moves
+  }
+
+  const makeMove = (sr, sc, tr, tc) => {
+    const newBoard = board.map(row => [...row])
+    newBoard[tr][tc] = board[sr][sc]
+    newBoard[sr][sc] = null
+    setBoard(newBoard)
+    setTurn(turn === 'white' ? 'black' : 'white')
+    setSelected(null)
+    setValidMoves([])
+  }
+
+  // Basic Computer AI
+  useEffect(() => {
+    if (turn === 'black') {
+      setTimeout(() => {
+        const allMoves = []
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            const p = board[r][c]
+            if (p && isBlackPiece(p)) {
+              const ms = getValidMoves(r, c, board)
+              ms.forEach(m => allMoves.push({ s: [r, c], t: m.split('-').map(Number) }))
+            }
+          }
+        }
+        if (allMoves.length > 0) {
+          const move = allMoves[Math.floor(Math.random() * allMoves.length)]
+          makeMove(move.s[0], move.s[1], move.t[0], move.t[1])
+        }
+      }, 800)
+    }
+  }, [turn])
+
+  const handleCellClick = (r, c) => {
+    if (turn !== 'white') return
+    const piece = board[r][c]
+    if (selected) {
+      if (validMoves.includes(`${r}-${c}`)) {
+        makeMove(selected[0], selected[1], r, c)
+      } else {
+        setSelected(null)
+        setValidMoves([])
+      }
+    } else {
+      if (piece && isWhitePiece(piece)) {
+        setSelected([r, c])
+        setValidMoves(getValidMoves(r, c, board))
+      }
+    }
+  }
 
   const getPieceIcon = (piece) => {
     if (!piece) return null
@@ -268,39 +372,12 @@ function ChessGame() {
     return <i className={`fas ${icon}`} style={{ color, filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))' }}></i>
   }
 
-  const handleCellClick = (r, c) => {
-    const piece = board[r][c]
-    
-    if (selected) {
-      // Move logic
-      const [sr, sc] = selected
-      if (sr === r && sc === c) {
-        setSelected(null)
-        return
-      }
-
-      // Very basic move execution
-      const newBoard = board.map(row => [...row])
-      newBoard[r][c] = board[sr][sc]
-      newBoard[sr][sc] = null
-      setBoard(newBoard)
-      setSelected(null)
-      setTurn(turn === 'white' ? 'black' : 'white')
-    } else {
-      if (!piece) return
-      const isWhite = piece === piece.toUpperCase()
-      if ((isWhite && turn === 'white') || (!isWhite && turn === 'black')) {
-        setSelected([r, c])
-      }
-    }
-  }
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 30, width: '100%' }}>
-      <div style={{ background: 'var(--bg2)', padding: '10px 20px', borderRadius: 12, border: '1px solid var(--purple)', boxShadow: '0 0 15px var(--purple-dim)' }}>
-        <h4 style={{ color: 'var(--purple)', margin: 0, fontSize: '1rem', fontWeight: 900 }}>
-          {turn.toUpperCase()}'S TURN
-        </h4>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 20 }}>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: 40, border: '1px solid var(--purple)' }}>
+        <div style={{ color: turn === 'white' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'white' ? '0 0 10px var(--purple)' : 'none' }}>PLAYER (WHITE)</div>
+        <div style={{ color: 'var(--text3)' }}>VS</div>
+        <div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI (BLACK)</div>
       </div>
 
       <div style={{ 
@@ -311,6 +388,7 @@ function ChessGame() {
         {board.map((row, r) => row.map((piece, c) => {
           const isBlackCell = (r + c) % 2 === 1
           const isSelected = selected && selected[0] === r && selected[1] === c
+          const isValid = validMoves.includes(`${r}-${c}`)
           return (
             <div 
               key={`${r}-${c}`}
@@ -319,18 +397,18 @@ function ChessGame() {
                 width: 55, height: 55, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer',
                 background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'),
-                fontSize: '1.8rem',
-                transition: 'all 0.1s'
+                fontSize: '1.8rem', position: 'relative'
               }}
             >
+              {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>}
               {getPieceIcon(piece)}
             </div>
           )
         }))}
       </div>
 
-      <button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setSelected(null)}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)' }}>
-        RESTART MATCH
+      <button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}>
+        <i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD
       </button>
     </div>
   )
