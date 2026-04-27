@@ -15,7 +15,7 @@ def allowed_file(filename):
 @profile_bp.route('/', methods=['GET'])
 @jwt_required()
 def get_profile():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     db = get_db()
     try:
         user = db.execute("SELECT id, name, email, first_name, last_name, mobile_no, linkedin, github, profile_pic, bio FROM users WHERE id = ?", (user_id,)).fetchone()
@@ -31,7 +31,7 @@ def get_profile():
 @profile_bp.route('/upload', methods=['POST'])
 @jwt_required()
 def upload_profile_pic():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
@@ -53,7 +53,7 @@ def upload_profile_pic():
 @profile_bp.route('/', methods=['POST'])
 @jwt_required()
 def update_profile():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
     db = get_db()
     try:

@@ -66,6 +66,8 @@ def init_db():
         except Exception as e:
             print(f"[DB INIT] Warning on table: {e}")
 
+    db.commit()
+
     # Auto-migration for user profile fields
     user_fields = [
         ("first_name", "TEXT"),
