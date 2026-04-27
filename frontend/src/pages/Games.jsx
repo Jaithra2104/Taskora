@@ -52,32 +52,109 @@ export default function Games() {
 
 function LexiCross() {
   const puzzles = [
-    { grid: [['A','R','R','A','Y','S'],['S','.','E','.','P','.'],['T','A','C','K','S','.'],['A','.','U','.','E','.'],['C','H','A','I','N','S'],['K','.','L','.','T','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Contiguous memory blocks for data.", h: "The most basic data structure.", w: "ARRAYS" }, { n: 2, r: 2, c: 0, q: "LIFO (Last-In First-Out) structures.", h: "Think of a pile of plates.", w: "STACKS" }, { n: 3, r: 4, c: 0, q: "Linked elements in a sequence.", h: "Used in Linked Lists.", w: "CHAINS" }], down: [{ n: 1, r: 0, c: 0, q: "LIFO data structure (Singular).", h: "Push and Pop happen here.", w: "ASTACK" }, { n: 4, r: 0, c: 2, q: "FIFO (First-In First-Out) structure.", h: "Like people standing in a line.", w: "RECALL" }, { n: 5, r: 0, c: 4, q: "Refers to a specific memory address.", h: "Used for direct memory access.", w: "YPENTS" }] } },
-    { grid: [['B','I','N','A','R','Y'],['I','.','E','.','O','.'],['K','E','R','N','E','L'],['E','.','V','.','B','.'],['S','O','C','K','E','T'],['.','.','R','.','T','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Base-2 numbering system.", h: "Only 0s and 1s.", w: "BINARY" }, { n: 2, r: 2, c: 0, q: "The core of an OS.", h: "Think Linux or Windows heart.", w: "KERNEL" }, { n: 3, r: 4, c: 0, q: "Endpoint for network communication.", h: "Connects an app to the web.", w: "SOCKET" }], down: [{ n: 1, r: 0, c: 0, q: "Fastest way to travel on two wheels.", h: "Motorcycle cousin.", w: "BIKES" }, { n: 4, r: 0, c: 2, q: "Never ending, like a loop.", h: "Infinite loop property.", w: "NEVER" }, { n: 5, r: 0, c: 4, q: "Automated machine or script.", h: "Short for robot.", w: "ROBOT" }] } },
-    { grid: [['S','O','R','T','E','D'],['O','.','O','.','X','.'],['R','E','C','U','R','S'],['T','.','K','.','A','.'],['E','M','A','I','L','S'],['D','.','S','.','Y','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Array arranged in specific order.", h: "Binary search requires this state.", w: "SORTED" }, { n: 2, r: 2, c: 0, q: "Function calling itself.", h: "Basis of Divide and Conquer.", w: "RECURS" }, { n: 3, r: 4, c: 0, q: "Digital messaging service.", h: "SMTP protocol is used here.", w: "EMAILS" }], down: [{ n: 1, r: 0, c: 0, q: "Arranging data into order.", h: "Bubble, Quick, or Merge...", w: "SORTED" }, { n: 4, r: 0, c: 2, q: "Fixed-size data structure.", h: "Often used in databases.", w: "ROCKSS" }, { n: 5, r: 0, c: 4, q: "A horizontal row in a grid.", h: "A dimension in 2D arrays.", w: "EXRAYS" }] } },
-    { grid: [['G','R','A','P','H','S'],['R','.','L','.','A','.'],['A','V','L','T','R','E'],['P','.','G','.','S','.'],['H','A','S','H','E','S'],['S','.','O','.','S','.']], clues: { across: [{ n: 1, r: 0, c: 0, q: "Nodes connected by edges.", h: "Used for social network modeling.", w: "GRAPHS" }, { n: 2, r: 2, c: 0, q: "Self-balancing binary search tree.", h: "Named after Adelson-Velsky and Landis.", w: "AVLTRE" }, { n: 3, r: 4, c: 0, q: "Unique IDs generated from data.", h: "Used in Hash Tables/Maps.", w: "HASHES" }], down: [{ n: 1, r: 0, c: 0, q: "Structure with vertices and edges.", h: "Can be directed or undirected.", w: "GRAPHS" }, { n: 4, r: 0, c: 2, q: "Mathematical set of rules.", h: "Instructions to solve a task.", w: "ALGOSY" }, { n: 5, r: 0, c: 4, q: "A single step in a process.", h: "One unit of a sequence.", w: "HARESS" }] } }
+    {
+      width: 10, height: 8,
+      grid: [
+          [null, null, 'L', 'I', 'O', 'N', null, null, null, null],
+          [null, null, 'O', null, null, null, null, null, 'C', null],
+          ['R', 'E', 'A', 'C', 'T', null, null, null, 'R', null],
+          [null, null, 'N', null, null, null, 'S', null, 'I', null],
+          [null, null, null, null, 'P', 'Y', 'T', 'H', 'O', 'N'],
+          [null, 'M', 'A', 'R', 'S', null, 'A', null, 'K', null],
+          [null, null, null, null, null, null, 'C', null, 'E', null],
+          [null, null, 'S', 'O', 'C', 'C', 'E', 'R', 'T', null],
+      ],
+      clues: {
+          across: [
+              { n: 1, r: 0, c: 2, q: "King of the jungle.", h: "4 letters, starts with L.", w: "LION" },
+              { n: 2, r: 2, c: 0, q: "A popular UI library.", h: "Used in this very project!", w: "REACT" },
+              { n: 3, r: 4, c: 4, q: "Snake-named coding language.", h: "Indentations matter here.", w: "PYTHON" },
+              { n: 4, r: 5, c: 1, q: "The Red Planet.", h: "Next door neighbor to Earth.", w: "MARS" },
+              { n: 5, r: 7, c: 2, q: "The world's most popular sport.", h: "Played with a round ball and feet.", w: "SOCCER" }
+          ],
+          down: [
+              { n: 1, r: 0, c: 2, q: "A primary predator of the savanna.", h: "Down version of 1 across.", w: "LOAN" },
+              { n: 6, r: 1, c: 8, q: "Sport played with a bat and ball.", h: "Famous in India and Australia.", w: "CRICKET" },
+              { n: 7, r: 3, c: 6, q: "A linear data structure.", h: "Elements follow one another.", w: "STACK" }
+          ]
+      }
+    },
+    {
+        width: 10, height: 8,
+        grid: [
+            [null, 'A', 'P', 'P', 'L', 'E', null, null, null, null],
+            [null, null, null, null, null, 'A', null, 'T', null, null],
+            ['S', 'T', 'A', 'C', 'K', 'S', null, 'E', null, null],
+            [null, null, null, null, null, 'T', null, 'N', null, null],
+            ['G','O','O','G','L','E', null, 'N', null, null],
+            [null, null, null, null, null, null, null, 'I', null, 'P'],
+            [null, 'C','H','E','S','S', null, 'S', null, 'I'],
+            [null, null, null, null, null, null, null, null, null, 'G']
+        ],
+        clues: {
+            across: [
+                { n: 1, r: 0, c: 1, q: "A fruit and a tech giant.", h: "Newton's inspiration.", w: "APPLE" },
+                { n: 2, r: 2, c: 0, q: "LIFO data structure.", h: "Push and Pop.", w: "STACKS" },
+                { n: 3, r: 4, c: 0, q: "The king of search engines.", h: "Alphabet's subsidiary.", w: "GOOGLE" },
+                { n: 4, r: 6, c: 1, q: "A game of kings and strategy.", h: "You are playing it in this Arcade!", w: "CHESS" }
+            ],
+            down: [
+                { n: 1, r: 0, c: 5, q: "Our home planet.", h: "The third rock from the sun.", w: "EARTHS" },
+                { n: 5, r: 1, c: 7, q: "Court game with rackets.", h: "Wimbledon is the home of this.", w: "TENNIS" },
+                { n: 6, r: 5, c: 9, q: "Farm animal with a snout.", h: "Pink and says Oink.", w: "PIG" }
+            ]
+        }
+    }
   ]
 
   const [puzzle] = useState(() => puzzles[Math.floor(Math.random() * puzzles.length)])
   const [userGrid, setUserGrid] = useState(() => {
-      const grid = puzzle.grid.map(row => row.map(cell => cell === '.' ? '.' : ''))
-      let prefilled = 0; while(prefilled < 3) { const r = Math.floor(Math.random()*6), c = Math.floor(Math.random()*6); if (grid[r][c] === '') { grid[r][c] = puzzle.grid[r][c]; prefilled++ } }; return grid
+      const grid = puzzle.grid.map(row => row.map(cell => cell === null ? null : ''))
+      let prefilled = 0; while(prefilled < 3) {
+          const r = Math.floor(Math.random()*puzzle.height), c = Math.floor(Math.random()*puzzle.width)
+          if (grid[r] && grid[r][c] === '') { grid[r][c] = puzzle.grid[r][c]; prefilled++ }
+      }
+      return grid
   })
-  const [selected, setSelected] = useState([0, 0]), [direction, setDirection] = useState('across'), [win, setWin] = useState(false), [hintUsed, setHintUsed] = useState(false), [revealUsed, setRevealUsed] = useState(false), [currentHint, setCurrentHint] = useState(null), [solvedWords, setSolvedWords] = useState([]), [popper, setPopper] = useState(false)
+  const [selected, setSelected] = useState(() => {
+      for(let r=0; r<puzzle.height; r++) for(let c=0; c<puzzle.width; c++) if(puzzle.grid[r][c] !== null) return [r, c]
+      return [0, 0]
+  })
+  const [direction, setDirection] = useState('across'), [win, setWin] = useState(false), [hintUsed, setHintUsed] = useState(false), [revealUsed, setRevealUsed] = useState(false), [currentHint, setCurrentHint] = useState(null), [solvedWords, setSolvedWords] = useState([]), [popper, setPopper] = useState(false)
 
-  const handleCellClick = (r, c) => { if (puzzle.grid[r][c] === '.') return; if (selected[0] === r && selected[1] === c) setDirection(direction === 'across' ? 'down' : 'across'); else setSelected([r, c]) }
+  const handleCellClick = (r, c) => { if (puzzle.grid[r][c] === null) return; if (selected[0] === r && selected[1] === c) setDirection(direction === 'across' ? 'down' : 'across'); else setSelected([r, c]) }
   const handleKeyDown = (e) => {
     if (win) return; const [r, c] = selected
     if (e.key.length === 1 && e.key.match(/[a-z0-9]/i)) {
         const newGrid = [...userGrid.map(row => [...row])]; newGrid[r][c] = e.key.toUpperCase(); setUserGrid(newGrid); playSound('click')
-        if (direction === 'across' && c < 5 && puzzle.grid[r][c+1] !== '.') setSelected([r, c+1]); else if (direction === 'down' && r < 5 && puzzle.grid[r+1][c] !== '.') setSelected([r+1, c]); checkProgress(newGrid)
+        // Smart move
+        if (direction === 'across') { let nc = c + 1; while(nc < puzzle.width && puzzle.grid[r][nc] === null) nc++; if (nc < puzzle.width) setSelected([r, nc]) }
+        else { let nr = r + 1; while(nr < puzzle.height && puzzle.grid[nr][c] === null) nr++; if (nr < puzzle.height) setSelected([nr, c]) }
+        checkProgress(newGrid)
     } else if (e.key === 'Backspace') { const newGrid = [...userGrid.map(row => [...row])]; newGrid[r][c] = ''; setUserGrid(newGrid) }
   }
+
   const checkProgress = (grid) => {
-      puzzle.clues.across.forEach(cl => { if (!solvedWords.includes(`A-${cl.n}`)) { let word = ""; for(let i=0; i<6; i++) { if(puzzle.grid[cl.r][i] !== '.') word += grid[cl.r][i] }; if (word === cl.w) { triggerPopper(); setSolvedWords(prev => [...prev, `A-${cl.n}`]) } } })
-      puzzle.clues.down.forEach(cl => { if (!solvedWords.includes(`D-${cl.n}`)) { let word = ""; for(let i=0; i<6; i++) { if(puzzle.grid[i] && puzzle.grid[i][cl.c] !== '.') word += grid[i][cl.c] }; if (word === cl.w) { triggerPopper(); setSolvedWords(prev => [...prev, `D-${cl.n}`]) } } })
-      if (grid.every((row, r) => row.every((cell, c) => cell === puzzle.grid[r][c]))) { setWin(true); playSound('win') }
+      let anyNew = false
+      puzzle.clues.across.forEach(cl => {
+          if (!solvedWords.includes(`A-${cl.n}`)) {
+              let currentWord = "";
+              for(let i=cl.c; i<puzzle.width; i++) { if(puzzle.grid[cl.r][i] === null) break; currentWord += (grid[cl.r][i] || ' ') }
+              if (currentWord === cl.w) { triggerPopper(); setSolvedWords(prev => [...prev, `A-${cl.n}`]); anyNew = true }
+          }
+      })
+      puzzle.clues.down.forEach(cl => {
+          if (!solvedWords.includes(`D-${cl.n}`)) {
+              let currentWord = "";
+              for(let i=cl.r; i<puzzle.height; i++) { if(!puzzle.grid[i] || puzzle.grid[i][cl.c] === null) break; currentWord += (grid[i][cl.c] || ' ') }
+              if (currentWord === cl.w) { triggerPopper(); setSolvedWords(prev => [...prev, `D-${cl.n}`]); anyNew = true }
+          }
+      })
+      // Global win check
+      let allCorrect = true; puzzle.grid.forEach((row, r) => row.forEach((cell, c) => { if(cell !== null && grid[r][c] !== cell) allCorrect = false }))
+      if (allCorrect) { setWin(true); playSound('win') }
   }
+
   const triggerPopper = () => { setPopper(true); playSound('success'); setTimeout(() => setPopper(false), 2000) }
   useEffect(() => { window.addEventListener('keydown', handleKeyDown); return () => window.removeEventListener('keydown', handleKeyDown) }, [selected, direction, win, solvedWords])
   const useHint = () => { if (hintUsed) return; setHintUsed(true); const clue = direction === 'across' ? puzzle.clues.across.find(cl => cl.r === selected[0]) : puzzle.clues.down.find(cl => cl.c === selected[1]); if (clue) setCurrentHint(clue.h) }
@@ -85,19 +162,26 @@ function LexiCross() {
   const getCellNum = (r, c) => { const a = puzzle.clues.across.find(cl => cl.r === r && cl.c === c), d = puzzle.clues.down.find(cl => cl.r === r && cl.c === c); return a ? a.n : (d ? d.n : null) }
 
   return (
-    <div style={{ display: 'flex', gap: 30, padding: 30, width: '100%', maxWidth: 1100 }}>
-        {popper && <div className="fade-in" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 100, fontSize: '3rem' }}>🎉🥳✨</div>}
+    <div style={{ display: 'flex', gap: 30, padding: 30, width: '100%', maxWidth: 1200, maxHeight: '85vh', overflow: 'hidden' }}>
+        {popper && <div className="fade-in" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 100, fontSize: '4rem' }}>🎉🥳✨</div>}
+        
+        {/* Irregular Grid Container */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 60px)', background: '#1a1a2e', padding: 10, borderRadius: 15, boxShadow: '0 20px 50px rgba(0,0,0,0.5)', height: 'fit-content', position: 'relative' }}>
-                {userGrid.map((row, r) => row.map((cell, c) => { const isBlack = cell === '.', isSelected = selected[0] === r && selected[1] === c, num = getCellNum(r, c); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, background: isBlack ? '#000' : (isSelected ? 'rgba(16, 185, 129, 0.2)' : '#fff'), border: '1px solid #ddd', cursor: isBlack ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 900, color: '#1a1a2e', position: 'relative' }}> {num && <span style={{ position: 'absolute', top: 2, left: 4, fontSize: '.65rem', color: '#1a1a2e' }}>{num}</span>} {!isBlack && cell} </div> ) }))}
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${puzzle.width}, 50px)`, gridTemplateRows: `repeat(${puzzle.height}, 50px)`, background: 'transparent', padding: 10, borderRadius: 15, height: 'fit-content', position: 'relative' }}>
+                {userGrid.map((row, r) => row.map((cell, c) => {
+                    const isVoid = cell === null, isSelected = selected[0] === r && selected[1] === c, num = getCellNum(r, c)
+                    return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 50, height: 50, background: isVoid ? 'transparent' : (isSelected ? 'rgba(16, 185, 129, 0.3)' : '#fff'), border: isVoid ? 'none' : '1px solid #ccc', cursor: isVoid ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 900, color: '#1a1a2e', position: 'relative', transition: 'all 0.2s', boxShadow: !isVoid ? '0 2px 5px rgba(0,0,0,0.1)' : 'none' }}> {num && <span style={{ position: 'absolute', top: 1, left: 3, fontSize: '.6rem', color: '#666' }}>{num}</span>} {!isVoid && cell} </div> )
+                }))}
                 {win && <div className="fade-in" style={{ position: 'absolute', inset: -10, background: 'rgba(5, 46, 22, 0.9)', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--emerald)', boxShadow: '0 0 50px var(--emerald)' }}><i className="fas fa-medal" style={{fontSize: '4rem', color: 'var(--yellow)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>GRID MASTER</h2><button className="btn btn-primary" onClick={() => window.location.reload()} style={{marginTop: 20}}>NEW PUZZLE</button></div>}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}><button className="btn" onClick={useHint} disabled={hintUsed} style={{ background: hintUsed ? 'var(--bg2)' : 'rgba(16, 185, 129, 0.1)', color: 'var(--emerald)', border: '1px solid var(--emerald)', opacity: hintUsed ? 0.5 : 1 }}><i className="fas fa-lightbulb" style={{marginRight: 8}}></i> HINT {hintUsed ? '(USED)' : '(1 LEFT)'}</button><button className="btn" onClick={useReveal} disabled={revealUsed} style={{ background: revealUsed ? 'var(--bg2)' : 'rgba(239, 68, 68, 0.1)', color: 'var(--red)', border: '1px solid var(--red)', opacity: revealUsed ? 0.5 : 1 }}><i className="fas fa-eye" style={{marginRight: 8}}></i> REVEAL {revealUsed ? '(USED)' : '(1 LEFT)'}</button></div>
             {currentHint && !win && <div className="fade-in" style={{ background: 'var(--bg2)', padding: 15, borderRadius: 12, borderLeft: '4px solid var(--emerald)', fontSize: '.9rem' }}><strong style={{color: 'var(--emerald)'}}>PRO TIP:</strong> {currentHint}</div>}
         </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20, maxHeight: 500, overflowY: 'auto', paddingRight: 10 }}>
-            <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: 25, borderRadius: 20, border: '1px solid var(--emerald-dim)' }}><h3 style={{ color: 'var(--emerald)', marginBottom: 15, fontSize: '1.2rem', fontWeight: 900 }}><i className="fas fa-arrows-left-right" style={{marginRight: 12}}></i> ACROSS</h3>{puzzle.clues.across.map(cl => ( <div key={cl.n} style={{ padding: '12px 0', borderBottom: '1px solid rgba(16, 185, 129, 0.1)', color: direction === 'across' && selected[0] === cl.r ? '#fff' : (solvedWords.includes(`A-${cl.n}`) ? 'var(--emerald)' : 'var(--text2)'), opacity: direction === 'across' && selected[0] === cl.r ? 1 : 0.6, fontSize: '.95rem' }}> <span style={{ fontWeight: 900, color: 'var(--emerald)', marginRight: 10 }}>{cl.n}.</span> {cl.q} {solvedWords.includes(`A-${cl.n}`) && <i className="fas fa-check-circle" style={{marginLeft: 8}}></i>} </div> ))}</div>
-            <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: 25, borderRadius: 20, border: '1px solid var(--emerald-dim)' }}><h3 style={{ color: 'var(--emerald)', marginBottom: 15, fontSize: '1.2rem', fontWeight: 900 }}><i className="fas fa-arrows-up-down" style={{marginRight: 12}}></i> DOWN</h3>{puzzle.clues.down.map(cl => ( <div key={cl.n} style={{ padding: '12px 0', borderBottom: '1px solid rgba(16, 185, 129, 0.1)', color: direction === 'down' && selected[1] === cl.c ? '#fff' : (solvedWords.includes(`D-${cl.n}`) ? 'var(--emerald)' : 'var(--text2)'), opacity: direction === 'down' && selected[1] === cl.c ? 1 : 0.6, fontSize: '.95rem' }}> <span style={{ fontWeight: 900, color: 'var(--emerald)', marginRight: 10 }}>{cl.n}.</span> {cl.q} {solvedWords.includes(`D-${cl.n}`) && <i className="fas fa-check-circle" style={{marginLeft: 8}}></i>} </div> ))}</div>
+
+        {/* Clues Area */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 15, overflowY: 'auto', paddingRight: 10 }}>
+            <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: 20, borderRadius: 20, border: '1px solid var(--emerald-dim)' }}><h3 style={{ color: 'var(--emerald)', marginBottom: 12, fontSize: '1.1rem', fontWeight: 900 }}><i className="fas fa-arrows-left-right" style={{marginRight: 10}}></i> ACROSS</h3>{puzzle.clues.across.map(cl => ( <div key={cl.n} style={{ padding: '10px 0', borderBottom: '1px solid rgba(16, 185, 129, 0.1)', color: direction === 'across' && selected[0] === cl.r ? '#fff' : (solvedWords.includes(`A-${cl.n}`) ? 'var(--emerald)' : 'var(--text2)'), opacity: direction === 'across' && selected[0] === cl.r ? 1 : 0.6, fontSize: '.9rem' }}> <span style={{ fontWeight: 900, color: 'var(--emerald)', marginRight: 10 }}>{cl.n}.</span> {cl.q} {solvedWords.includes(`A-${cl.n}`) && <i className="fas fa-check-circle" style={{marginLeft: 8}}></i>} </div> ))}</div>
+            <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: 20, borderRadius: 20, border: '1px solid var(--emerald-dim)' }}><h3 style={{ color: 'var(--emerald)', marginBottom: 12, fontSize: '1.1rem', fontWeight: 900 }}><i className="fas fa-arrows-up-down" style={{marginRight: 10}}></i> DOWN</h3>{puzzle.clues.down.map(cl => ( <div key={cl.n} style={{ padding: '10px 0', borderBottom: '1px solid rgba(16, 185, 129, 0.1)', color: direction === 'down' && selected[1] === cl.c ? '#fff' : (solvedWords.includes(`D-${cl.n}`) ? 'var(--emerald)' : 'var(--text2)'), opacity: direction === 'down' && selected[1] === cl.c ? 1 : 0.6, fontSize: '.9rem' }}> <span style={{ fontWeight: 900, color: 'var(--emerald)', marginRight: 10 }}>{cl.n}.</span> {cl.q} {solvedWords.includes(`D-${cl.n}`) && <i className="fas fa-check-circle" style={{marginLeft: 8}}></i>} </div> ))}</div>
         </div>
     </div>
   )
