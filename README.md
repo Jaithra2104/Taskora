@@ -1,4 +1,4 @@
-# Smart Student Companion 📘
+# Taskora 📘
 
 A smart productivity platform for students — manage timetables, homework, assignments, certificates, syllabus progress, and get AI-powered study assistance.
 
@@ -64,29 +64,19 @@ Tuesday,Chemistry,09:00,10:00,Lab 1
 ## Project Structure
 
 ```
-Project Student/
+Taskora/
+├── runtime.txt             # Python version (Critical for deployment)
+├── Procfile                # Heroku/Render process file
+├── requirements.txt        # Backend dependencies (Root level)
 ├── backend/
 │   ├── app.py              # Main Flask server
 │   ├── config.py           # Configuration
 │   ├── models.py           # Database schema
+│   ├── requirements.txt    # Local backend dependencies
 │   ├── routes/             # API route handlers
-│   │   ├── auth.py
-│   │   ├── timetable.py
-│   │   ├── homework.py
-│   │   ├── assignments.py
-│   │   ├── certificates.py
-│   │   └── syllabus.py
-│   ├── services/           # Background services
-│   │   ├── scheduler.py
-│   │   └── file_handler.py
-│   └── requirements.txt
+│   └── services/           # Background services
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx
-│   │   ├── index.css       # Design system
-│   │   ├── context/        # Auth state
-│   │   ├── pages/          # All page components
-│   │   └── components/     # Shared components
 │   └── package.json
 └── README.md
 ```

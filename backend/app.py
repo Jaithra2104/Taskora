@@ -151,6 +151,11 @@ def health():
     return jsonify({'status': 'ok', 'message': 'Smart Student Companion API is running'}), 200
 
 
+@app.route('/')
+def home():
+    return "Taskora Backend is Running 🚀"
+
+
 # Initialize DB and Scheduler on startup
 try:
     with app.app_context():
