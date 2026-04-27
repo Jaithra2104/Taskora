@@ -137,16 +137,34 @@ def clear_reminders():
         db.close()
 
 
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 @app.route('/api/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok', 'message': 'Smart Student Companion API is running'}), 200
 
 
 # Initialize DB and Scheduler on startup
-with app.app_context():
-    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
-    init_db()
-    init_scheduler()
+try:
+    with app.app_context():
+        logger.info("Initializing application components...")
+        os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+        init_db()
+        init_scheduler()
+        logger.info("[OK] Application initialized successfully")
+except Exception as e:
+    logger.error(f"CRITICAL STARTUP ERROR: {str(e)}")
+    import traceback
+    logger.error(traceback.format_exc())
+    # Don't exit here, let the app try to start so we can see logs
+    pass
 
 
 if __name__ == '__main__':

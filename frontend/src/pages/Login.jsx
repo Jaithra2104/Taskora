@@ -47,12 +47,14 @@ export default function Login() {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Email Address</label>
-            <input className="form-input" type="email" placeholder="you@email.com" required
+            <input className="form-input" type="email" name="user_email_unique" placeholder="you@email.com" required
+              autoComplete="new-password"
               value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input className="form-input" type="password" placeholder="••••••••" required
+            <input className="form-input" type="password" name="user_password_unique" placeholder="••••••••" required
+              autoComplete="new-password"
               value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
           </div>
           <button className="btn btn-primary w-full" disabled={loading}

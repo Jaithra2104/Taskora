@@ -50,21 +50,25 @@ export default function Signup() {
           <div className="form-group">
             <label className="form-label">Full Name</label>
             <input className="form-input" type="text" placeholder="John Doe" required
+              autoComplete="off"
               value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </div>
           <div className="form-group">
             <label className="form-label">Email Address</label>
             <input className="form-input" type="email" placeholder="you@email.com" required
+              autoComplete="off"
               value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
             <input className="form-input" type="password" placeholder="Min. 6 characters" required
+              autoComplete="off"
               value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
           </div>
           <div className="form-group">
             <label className="form-label">Confirm Password</label>
             <input className="form-input" type="password" placeholder="Re-enter password" required
+              autoComplete="off"
               value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} />
           </div>
           <button className="btn btn-primary w-full" disabled={loading}

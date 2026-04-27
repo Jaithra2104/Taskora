@@ -1,7 +1,7 @@
 import sqlite3
 import os
-import psycopg
-from psycopg.rows import dict_row
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from config import Config
 
 
@@ -32,7 +32,7 @@ def get_db():
     db_url = getattr(Config, 'DATABASE_URL', None)
     
     if db_url and db_url.startswith('postgres'):
-        conn = psycopg.connect(db_url, row_factory=dict_row)
+        conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
         return DBWrapper(conn, is_pg=True)
     else:
         conn = sqlite3.connect(Config.DATABASE_PATH)
