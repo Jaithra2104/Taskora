@@ -80,15 +80,16 @@ export default function Profile() {
     
     setSaving(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/api/profile/upload`, {
+      const res = await authFetch('/api/profile/upload', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         body: formData
       })
+      if (!res) throw new Error('Authorization failed. Please login again.')
+      
       const data = await res.json()
       if (res.ok) {
         setForm(prev => ({ ...prev, profile_pic: data.file_url }))
-        setSuccess('Photo uploaded!')
+        setSuccess('Photo uploaded successfully!')
       } else {
         throw new Error(data.error || 'Upload failed')
       }

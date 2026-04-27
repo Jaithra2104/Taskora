@@ -18,7 +18,8 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Initialize extensions
-CORS(app, origins=["https://taskora-khaki.vercel.app", "http://localhost:5173"])
+# Allow both single and double dash Vercel domains + localhost
+CORS(app, origins=["https://taskora-khaki.vercel.app", "https://taskora--khaki.vercel.app", "http://localhost:5173"])
 jwt = JWTManager(app)
 
 # Register blueprints
