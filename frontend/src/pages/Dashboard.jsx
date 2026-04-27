@@ -49,6 +49,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [hwModal, setHwModal] = useState(null) // subject name when open
   const [hwForm, setHwForm] = useState({ subject:'', description:'', due_date:'' })
   const [hwSaving, setHwSaving] = useState(false)
@@ -58,9 +59,20 @@ export default function Dashboard() {
   const showToast = (msg, type='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000) }
 
   const load = useCallback(async () => {
-    const res = await authFetch('/api/dashboard')
-    if (res?.ok) { const d = await res.json(); setData(d) }
-    setLoading(false)
+    try {
+      const res = await authFetch('/api/dashboard')
+      if (res?.ok) {
+        const d = await res.json()
+        setData(d)
+      } else {
+        const d = await res.json()
+        setError(d.details || d.error || 'Failed to load dashboard')
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }, [authFetch])
 
   useEffect(() => { load() }, [load])
@@ -94,7 +106,17 @@ export default function Dashboard() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
-  if (!data) return <div className="empty-state"><p>Failed to load</p></div>
+  if (error) return (
+    <div className="empty-state">
+      <div className="icon">⚠</div>
+      <h3>Failed to load dashboard</h3>
+      <p style={{ color:'var(--rose)', marginTop:10, fontSize:'.85rem', maxWidth:400 }}>{error}</p>
+      <button className="btn btn-secondary btn-sm" style={{ marginTop:20 }} onClick={() => { setError(null); setLoading(true); load(); }}>
+        Retry Connection
+      </button>
+    </div>
+  )
+  if (!data) return null
 
   const pendingHW = (data.stats.homework.total||0) - (data.stats.homework.completed||0)
   const hwPct = data.stats.homework.total > 0 ? Math.round((data.stats.homework.completed/data.stats.homework.total)*100) : 0
