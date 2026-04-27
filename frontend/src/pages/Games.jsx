@@ -6,6 +6,47 @@ const GAMES = [
   { id: 'crossword', name: 'LexiCross', icon: 'fa-font', color: 'var(--emerald)', desc: 'Boost your vocabulary with daily word grids.' }
 ]
 
+// Audio Utility using Web Audio API (Zero dependencies)
+const playSound = (type) => {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+
+    if (type === 'click') {
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(440, ctx.currentTime)
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1)
+        gain.gain.setValueAtTime(0.1, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
+        osc.start()
+        osc.stop(ctx.currentTime + 0.1)
+    } else if (type === 'error') {
+        osc.type = 'sawtooth'
+        osc.frequency.setValueAtTime(110, ctx.currentTime)
+        gain.gain.setValueAtTime(0.1, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+        osc.start()
+        osc.stop(ctx.currentTime + 0.3)
+    } else if (type === 'win') {
+        const frequencies = [523.25, 659.25, 783.99, 1046.50] // C major chord
+        frequencies.forEach((f, i) => {
+            const o = ctx.createOscillator()
+            const g = ctx.createGain()
+            o.type = 'sine'
+            o.frequency.setValueAtTime(f, ctx.currentTime + i * 0.1)
+            g.connect(ctx.destination)
+            o.connect(g)
+            g.gain.setValueAtTime(0.1, ctx.currentTime + i * 0.1)
+            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.5)
+            o.start(ctx.currentTime + i * 0.1)
+            o.stop(ctx.currentTime + i * 0.1 + 0.5)
+        })
+    }
+}
+
 export default function Games() {
   const [activeGame, setActiveGame] = useState(null)
 
@@ -60,12 +101,9 @@ export default function Games() {
           </div>
           
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f', position: 'relative', overflow: 'hidden' }}>
-             {/* Dynamic background particles */}
              <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '120%', background: `radial-gradient(circle at 50% 50%, ${GAMES.find(g => g.id === activeGame).color}08 0%, transparent 70%)`, pointerEvents: 'none' }}></div>
-             
             {activeGame === 'sudoku' && <Sudoku6x6 />}
             {activeGame === 'chess' && <ChessGame />}
-            {activeGame === 'crossword' && <div className="text-center" style={{position: 'relative'}}><i className="fas fa-font" style={{fontSize: '6rem', color: 'var(--emerald)', marginBottom: 25, filter: 'drop-shadow(0 0 20px var(--emerald))'}}></i><p style={{fontSize: '1.4rem', fontWeight: 900}}>LEXICROSS DAILY</p><p style={{fontSize: '.95rem', color: 'var(--text3)'}}>New vocabulary puzzles arrive every 24 hours.</p></div>}
           </div>
         </div>
       )}
@@ -86,147 +124,97 @@ function Sudoku6x6() {
     const saved = localStorage.getItem('taskora_sudoku_scores')
     return saved ? JSON.parse(saved) : { easy: null, medium: null, hard: null }
   })
-  
   const timerRef = useRef(null)
 
   const formatTime = (s) => {
     if (s === null) return '--:--'
-    const mins = Math.floor(s / 60)
-    const secs = s % 60
+    const mins = Math.floor(s / 60), secs = s % 60
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`
   }
 
   const generatePuzzle = (diff) => {
-    let solved = [
-      [1, 2, 3, 4, 5, 6], [4, 5, 6, 1, 2, 3], [2, 3, 1, 5, 6, 4],
-      [5, 6, 4, 2, 3, 1], [3, 1, 2, 6, 4, 5], [6, 4, 5, 3, 1, 2]
-    ]
-    for (let i = 0; i < 3; i++) {
-        if (Math.random() > 0.5) {
-            const r1 = i * 2, r2 = i * 2 + 1; const temp = solved[r1]; solved[r1] = solved[r2]; solved[r2] = temp
-        }
-    }
-    for (let i = 0; i < 2; i++) {
-        if (Math.random() > 0.5) {
-            const c1 = i * 3, c2 = i * 3 + (Math.floor(Math.random() * 2) + 1) % 3
-            for(let r=0; r<6; r++) { const temp = solved[r][c1]; solved[r][c1] = solved[r][c2]; solved[r][c2] = temp }
-        }
-    }
+    let solved = [[1,2,3,4,5,6],[4,5,6,1,2,3],[2,3,1,5,6,4],[5,6,4,2,3,1],[3,1,2,6,4,5],[6,4,5,3,1,2]]
+    for (let i = 0; i < 3; i++) if (Math.random() > 0.5) { const r1 = i*2, r2 = i*2+1; const temp = solved[r1]; solved[r1] = solved[r2]; solved[r2] = temp }
+    for (let i = 0; i < 2; i++) if (Math.random() > 0.5) { const c1 = i*3, c2 = i*3 + (Math.floor(Math.random()*2)+1)%3; for(let r=0; r<6; r++) { const temp = solved[r][c1]; solved[r][c1] = solved[r][c2]; solved[r][c2] = temp } }
     const cellsToRemove = diff === 'easy' ? 12 : (diff === 'medium' ? 18 : 24)
-    const newGrid = solved.map(row => [...row])
-    const initCells = []
-    let removed = 0
-    while (removed < cellsToRemove) {
-      const r = Math.floor(Math.random() * 6), c = Math.floor(Math.random() * 6)
-      if (newGrid[r][c] !== 0) { newGrid[r][c] = 0; removed++ }
-    }
+    const newGrid = solved.map(row => [...row]), initCells = []
+    let removed = 0; while (removed < cellsToRemove) { const r = Math.floor(Math.random()*6), c = Math.floor(Math.random()*6); if (newGrid[r][c] !== 0) { newGrid[r][c] = 0; removed++ } }
     for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] !== 0) initCells.push(`${r}-${c}`)
-    
     setGrid(newGrid); setInitial(initCells); setWin(false); setSelected([null, null]); setInvalidCells([]); setGlowingGroups({ rows: [], cols: [], boxes: [] }); setSeconds(0)
-    
-    if (timerRef.current) clearInterval(timerRef.current)
-    timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000)
+    if (timerRef.current) clearInterval(timerRef.current); timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000)
   }
 
   useEffect(() => {
     generatePuzzle(difficulty)
-    return () => clearInterval(timerRef.current)
-  }, [difficulty])
+    const handleKeyDown = (e) => {
+        if (win || !selected[0] === null) return
+        if (e.key >= '1' && e.key <= '6') handleNumberClick(parseInt(e.key))
+        if (e.key === 'Backspace' || e.key === '0') handleNumberClick(0)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => { clearInterval(timerRef.current); window.removeEventListener('keydown', handleKeyDown) }
+  }, [difficulty, selected, win])
 
   const validateGrid = (newGrid) => {
-    const invalid = []
-    const newGlow = { rows: [], cols: [], boxes: [] }
-
+    const invalid = [], newGlow = { rows: [], cols: [], boxes: [] }
     for (let r = 0; r < 6; r++) {
-      const counts = {}, vals = []
-      for (let c = 0; c < 6; c++) {
-        const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
-      }
+      const counts = {}, vals = []; for (let c = 0; c < 6; c++) { const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) } }
       if (new Set(vals).size === 6) newGlow.rows.push(r)
       for (let c = 0; c < 6; c++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
     }
-
     for (let c = 0; c < 6; c++) {
-      const counts = {}, vals = []
-      for (let r = 0; r < 6; r++) {
-        const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
-      }
+      const counts = {}, vals = []; for (let r = 0; r < 6; r++) { const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) } }
       if (new Set(vals).size === 6) newGlow.cols.push(c)
       for (let r = 0; r < 6; r++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
     }
-
     for (let b = 0; b < 6; b++) {
-      const rStart = Math.floor(b / 2) * 2, cStart = (b % 2) * 3
-      const counts = {}, vals = []
-      for (let r = rStart; r < rStart + 2; r++) {
-        for (let c = cStart; c < cStart + 3; c++) {
-          const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) }
-        }
-      }
+      const rStart = Math.floor(b / 2) * 2, cStart = (b % 2) * 3, counts = {}, vals = []
+      for (let r = rStart; r < rStart + 2; r++) for (let c = cStart; c < cStart + 3; c++) { const val = newGrid[r][c]; if (val !== 0) { counts[val] = (counts[val] || 0) + 1; vals.push(val) } }
       if (new Set(vals).size === 6) newGlow.boxes.push(b)
-      for (let r = rStart; r < rStart + 2; r++) {
-        for (let c = cStart; c < cStart + 3; c++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
-      }
+      for (let r = rStart; r < rStart + 2; r++) for (let c = cStart; c < cStart + 3; c++) if (newGrid[r][c] !== 0 && counts[newGrid[r][c]] > 1) invalid.push(`${r}-${c}`)
     }
-
-    setInvalidCells([...new Set(invalid)])
-    setGlowingGroups(newGlow)
+    setInvalidCells([...new Set(invalid)]); setGlowingGroups(newGlow)
     setTimeout(() => setGlowingGroups({ rows: [], cols: [], boxes: [] }), 1200)
-
-    let filled = true
-    for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] === 0) filled = false
     
+    // Play Sounds
+    if (invalid.length > invalidCells.length) playSound('error')
+    else if (newGlow.rows.length + newGlow.cols.length + newGlow.boxes.length > (glowingGroups.rows.length + glowingGroups.cols.length + glowingGroups.boxes.length)) playSound('click')
+
+    let filled = true; for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(newGrid[r][c] === 0) filled = false
     if (filled && invalid.length === 0) {
-      setWin(true)
-      clearInterval(timerRef.current)
+      setWin(true); clearInterval(timerRef.current); playSound('win')
       const currentBest = highScores[difficulty]
-      if (currentBest === null || seconds < currentBest) {
-        const updated = { ...highScores, [difficulty]: seconds }
-        setHighScores(updated)
-        localStorage.setItem('taskora_sudoku_scores', JSON.stringify(updated))
-      }
+      if (currentBest === null || seconds < currentBest) { const updated = { ...highScores, [difficulty]: seconds }; setHighScores(updated); localStorage.setItem('taskora_sudoku_scores', JSON.stringify(updated)) }
     }
   }
 
   const handleCellClick = (r, c) => !initial.includes(`${r}-${c}`) && setSelected([r, c])
   const handleNumberClick = (num) => {
     if (selected[0] !== null) {
-      const newGrid = grid.map(row => [...row])
-      newGrid[selected[0]][selected[1]] = num
-      setGrid(newGrid); validateGrid(newGrid)
+      const newGrid = grid.map(row => [...row]); newGrid[selected[0]][selected[1]] = num
+      setGrid(newGrid); validateGrid(newGrid); if (num !== 0 && !invalidCells.includes(`${selected[0]}-${selected[1]}`)) playSound('click')
     }
   }
 
-  const isCellInGlowingGroup = (r, c) => {
-    if (glowingGroups.rows.includes(r)) return true
-    if (glowingGroups.cols.includes(c)) return true
-    const b = Math.floor(r / 2) * 2 + Math.floor(c / 3)
-    return glowingGroups.boxes.includes(b)
-  }
+  const isCellInGlowingGroup = (r, c) => glowingGroups.rows.includes(r) || glowingGroups.cols.includes(c) || glowingGroups.boxes.includes(Math.floor(r/2)*2+Math.floor(c/3))
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 25, padding: '30px', width: '100%', maxWidth: 800 }}>
-      {/* Stats Board */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, width: '100%', maxWidth: 500 }}>
-          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center', boxShadow: 'inset 0 0 15px rgba(0,0,0,0.5)' }}>
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center' }}>
             <div style={{fontSize: '.75rem', color: 'var(--text3)', fontWeight: 800, letterSpacing: 1, marginBottom: 5}}>TIMER</div>
             <div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--cyan)', fontFamily: 'monospace'}}>{formatTime(seconds)}</div>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center', boxShadow: 'inset 0 0 15px rgba(0,0,0,0.5)' }}>
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center' }}>
             <div style={{fontSize: '.75rem', color: 'var(--text3)', fontWeight: 800, letterSpacing: 1, marginBottom: 5}}>{difficulty.toUpperCase()} BEST</div>
-            <div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--yellow)', fontFamily: 'monospace'}}>
-              {formatTime(highScores[difficulty])}
-            </div>
+            <div style={{fontSize: '1.8rem', fontWeight: 900, color: 'var(--yellow)', fontFamily: 'monospace'}}>{formatTime(highScores[difficulty])}</div>
           </div>
       </div>
 
-      {/* Control Panel */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: 15, width: '100%', maxWidth: 500, background: 'var(--bg2)', padding: '15px', borderRadius: 25, border: '1px solid var(--border)' }}>
          <div style={{ flex: 1 }}>
             <select className="form-input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} style={{ background: 'transparent', border: 'none', fontWeight: 800, color: 'var(--cyan)', height: '40px' }}>
-              <option value="easy">EASY MODE</option>
-              <option value="medium">MEDIUM MODE</option>
-              <option value="hard">HARD MODE</option>
+              <option value="easy">EASY MODE</option><option value="medium">MEDIUM MODE</option><option value="hard">HARD MODE</option>
             </select>
          </div>
          <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ height: 40, padding: '0 25px', borderRadius: 15 }}>
@@ -235,11 +223,7 @@ function Sudoku6x6() {
       </div>
 
       <div style={{ position: 'relative' }}>
-        <div style={{ 
-            display: 'grid', gridTemplateColumns: 'repeat(6, 65px)', 
-            border: '6px solid #1a1a2e', borderRadius: 20, overflow: 'hidden',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.5)', background: '#0f0f1a' 
-        }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 65px)', border: '6px solid #1a1a2e', borderRadius: 20, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', background: '#0f0f1a' }}>
           {grid.map((row, r) => row.map((cell, c) => {
             const isInitial = initial.includes(`${r}-${c}`), isSelected = selected[0] === r && selected[1] === c, isInvalid = invalidCells.includes(`${r}-${c}`), isGlowing = isCellInGlowingGroup(r, c)
             return (
@@ -249,34 +233,27 @@ function Sudoku6x6() {
             )
           }))}
         </div>
-        
         {win && (
           <div className="fade-in" style={{ position: 'absolute', inset: -20, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 30, zIndex: 10, border: '2px solid var(--cyan)', boxShadow: '0 0 60px var(--cyan-dim)' }}>
-            <div style={{ width: 100, height: 100, background: 'var(--grad-cyan)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 25, boxShadow: '0 0 40px var(--cyan)' }}>
-                <i className="fas fa-check" style={{fontSize: '3.5rem', color: '#000'}}></i>
-            </div>
-            <h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900, letterSpacing: 2}}>LEVEL COMPLETE</h2>
+            <div style={{ width: 100, height: 100, background: 'var(--grad-cyan)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 25, boxShadow: '0 0 40px var(--cyan)' }}><i className="fas fa-check" style={{fontSize: '3.5rem', color: '#000'}}></i></div>
+            <h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>LEVEL COMPLETE</h2>
             <div style={{ display: 'flex', gap: 30, margin: '20px 0' }}>
                 <div style={{textAlign: 'center'}}><p style={{fontSize: '.8rem', color: 'var(--text3)'}}>TIME</p><h3 style={{fontSize: '1.8rem', color: 'var(--cyan)'}}>{formatTime(seconds)}</h3></div>
                 <div style={{textAlign: 'center'}}><p style={{fontSize: '.8rem', color: 'var(--text3)'}}>BEST</p><h3 style={{fontSize: '1.8rem', color: 'var(--yellow)'}}>{formatTime(highScores[difficulty])}</h3></div>
             </div>
             {seconds === highScores[difficulty] && <div className="pulse" style={{ color: 'var(--yellow)', fontWeight: 900, marginBottom: 25 }}>🏆 NEW RECORD SET! 🏆</div>}
-            <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ padding: '15px 40px', fontSize: '1.1rem', borderRadius: 20 }}>PLAY NEXT ROUND</button>
+            <button className="btn btn-primary" onClick={() => generatePuzzle(difficulty)} style={{ padding: '15px 40px', borderRadius: 20 }}>PLAY NEXT</button>
           </div>
         )}
       </div>
 
-      {/* Number Pad */}
       <div style={{ display: 'flex', gap: 15, flexWrap: 'wrap', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: 30, border: '1px solid var(--border)' }}>
         {[1,2,3,4,5,6].map(num => (
-          <button key={num} onClick={() => handleNumberClick(num)} className="btn hover-glow" style={{ width: 65, height: 65, borderRadius: 20, padding: 0, justifyContent: 'center', fontSize: '1.8rem', fontWeight: 900, background: 'var(--bg2)', border: '2px solid var(--cyan)', color: 'var(--cyan)', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
-            {num}
-          </button>
+          <button key={num} onClick={() => handleNumberClick(num)} className="btn hover-glow" style={{ width: 65, height: 65, borderRadius: 20, padding: 0, justifyContent: 'center', fontSize: '1.8rem', fontWeight: 900, background: 'var(--bg2)', border: '2px solid var(--cyan)', color: 'var(--cyan)' }}>{num}</button>
         ))}
-        <button onClick={() => handleNumberClick(0)} className="btn" style={{ width: 100, height: 65, borderRadius: 20, padding: 0, justifyContent: 'center', border: '2px solid var(--red)', color: '#ff4d4d', background: 'rgba(239, 68, 68, 0.05)', fontWeight: 800 }}>
-          ERASE
-        </button>
+        <button onClick={() => handleNumberClick(0)} className="btn" style={{ width: 100, height: 65, borderRadius: 20, border: '2px solid var(--red)', color: '#ff4d4d', background: 'rgba(239, 68, 68, 0.05)', fontWeight: 800 }}>ERASE</button>
       </div>
+      <p style={{fontSize: '.8rem', color: 'var(--text3)', fontStyle: 'italic'}}>PC Tip: Use numbers 1-6 on your keyboard to play faster!</p>
     </div>
   )
 }
@@ -305,35 +282,9 @@ function ChessGame() {
     if (target) { if (isWhitePiece(target)) setCapturedWhite(prev => [...prev, target]); else setCapturedBlack(prev => [...prev, target]); if (target.toLowerCase() === 'k') setGameOver(isWhitePiece(target) ? 'black' : 'white') }
     const newBoard = board.map(row => [...row]); newBoard[tr][tc] = board[sr][sc]; newBoard[sr][sc] = null; setBoard(newBoard); setTurn(turn === 'white' ? 'black' : 'white'); setSelected(null); setValidMoves([])
   }
-  useEffect(() => {
-    if (turn === 'black' && !gameOver) {
-      setTimeout(() => {
-        const allMoves = []; for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = board[r][c]; if (p && isBlackPiece(p)) { const ms = getValidMoves(r, c, board); ms.forEach(m => allMoves.push({ s: [r, c], t: m.split('-').map(Number) })) } }
-        if (allMoves.length > 0) { const move = allMoves[Math.floor(Math.random() * allMoves.length)]; makeMove(move.s[0], move.s[1], move.t[0], move.t[1]) }
-      }, 800)
-    }
-  }, [turn, gameOver])
-  const handleCellClick = (r, c) => {
-    if (turn !== 'white' || gameOver) return; const piece = board[r][c]
-    if (selected) { if (validMoves.includes(`${r}-${c}`)) makeMove(selected[0], selected[1], r, c); else { setSelected(null); setValidMoves([]) } }
-    else if (piece && isWhitePiece(piece)) { setSelected([r, c]); setValidMoves(getValidMoves(r, c, board)) }
-  }
-  const getPieceIcon = (piece, size = '1.8rem', colorOverride = null) => {
-    if (!piece) return null; const color = colorOverride || (piece === piece.toUpperCase() ? '#fff' : '#8b5cf6'), type = piece.toLowerCase()
-    let icon = ''; switch(type) { case 'r': icon = 'fa-chess-rook'; break; case 'n': icon = 'fa-chess-knight'; break; case 'b': icon = 'fa-chess-bishop'; break; case 'q': icon = 'fa-chess-queen'; break; case 'k': icon = 'fa-chess-king'; break; case 'p': icon = 'fa-chess-pawn'; break }
-    return <i className={`fas ${icon}`} style={{ color, filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))', fontSize: size }}></i>
-  }
-  const CapturedArea = ({ pieces, title }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 60, alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: 10, borderRadius: 12, border: '1px solid var(--border)' }}>
-      <div style={{ fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800 }}>{title}</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 400, flexWrap: 'wrap' }}>{pieces.map((p, i) => <div key={i}>{getPieceIcon(p, '1.2rem')}</div>)}</div>
-    </div>
-  )
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 30 }}>
-      <div style={{ display: 'flex', gap: 20, alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: 40, border: '1px solid var(--purple)' }}><div style={{ color: turn === 'white' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'white' ? '0 0 10px var(--purple)' : 'none' }}>PLAYER</div><div style={{ color: 'var(--text3)' }}>VS</div><div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI</div></div>
-      <div style={{ display: 'flex', gap: 30, alignItems: 'flex-start' }}><CapturedArea pieces={capturedWhite} title="LOST" /><div style={{ position: 'relative' }}><div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 60px)', border: '6px solid #1a1a2e', borderRadius: 15, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>{board.map((row, r) => row.map((piece, c) => { const isBlackCell = (r + c) % 2 === 1, isSelected = selected && selected[0] === r && selected[1] === c, isValid = validMoves.includes(`${r}-${c}`); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'), fontSize: '1.8rem', position: 'relative' }}> {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>} {getPieceIcon(piece)} </div> ) }))}</div>{gameOver && ( <div className="fade-in" style={{ position: 'absolute', inset: -15, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 60px var(--purple-dim)' }}><i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>{gameOver === 'white' ? 'VICTORY!' : 'GAME OVER'}</h2><p style={{color: 'var(--text2)', marginBottom: 20}}>{gameOver === 'white' ? 'You defeated the Taskora AI.' : 'The AI has claimed your kingdom.'}</p><button className="btn btn-primary" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}}>REMATCH</button></div> )}</div><CapturedArea pieces={capturedBlack} title="ENEMY LOST" /></div>
-      <button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}><i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD</button>
-    </div>
-  )
+  useEffect(() => { if (turn === 'black' && !gameOver) { setTimeout(() => { const allMoves = []; for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = board[r][c]; if (p && isBlackPiece(p)) { const ms = getValidMoves(r, c, board); ms.forEach(m => allMoves.push({ s: [r, c], t: m.split('-').map(Number) })) } } if (allMoves.length > 0) { const move = allMoves[Math.floor(Math.random() * allMoves.length)]; makeMove(move.s[0], move.s[1], move.t[0], move.t[1]) } }, 800) } }, [turn, gameOver])
+  const handleCellClick = (r, c) => { if (turn !== 'white' || gameOver) return; const piece = board[r][c]; if (selected) { if (validMoves.includes(`${r}-${c}`)) makeMove(selected[0], selected[1], r, c); else { setSelected(null); setValidMoves([]) } } else if (piece && isWhitePiece(piece)) { setSelected([r, c]); setValidMoves(getValidMoves(r, c, board)) } }
+  const getPieceIcon = (piece, size = '1.8rem', colorOverride = null) => { if (!piece) return null; const color = colorOverride || (piece === piece.toUpperCase() ? '#fff' : '#8b5cf6'), type = piece.toLowerCase(); let icon = ''; switch(type) { case 'r': icon = 'fa-chess-rook'; break; case 'n': icon = 'fa-chess-knight'; break; case 'b': icon = 'fa-chess-bishop'; break; case 'q': icon = 'fa-chess-queen'; break; case 'k': icon = 'fa-chess-king'; break; case 'p': icon = 'fa-chess-pawn'; break }; return <i className={`fas ${icon}`} style={{ color, filter: 'drop-shadow(0 0 5px rgba(0,0,0,0.5))', fontSize: size }}></i> }
+  const CapturedArea = ({ pieces, title }) => ( <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 60, alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: 10, borderRadius: 12, border: '1px solid var(--border)' }}><div style={{ fontSize: '.7rem', color: 'var(--text3)', fontWeight: 800 }}>{title}</div><div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 400, flexWrap: 'wrap' }}>{pieces.map((p, i) => <div key={i}>{getPieceIcon(p, '1.2rem')}</div>)}</div></div> )
+  return ( <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%', padding: 30 }}><div style={{ display: 'flex', gap: 20, alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '10px 30px', borderRadius: 40, border: '1px solid var(--purple)' }}><div style={{ color: turn === 'white' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'white' ? '0 0 10px var(--purple)' : 'none' }}>PLAYER</div><div style={{ color: 'var(--text3)' }}>VS</div><div style={{ color: turn === 'black' ? 'var(--purple)' : 'var(--text3)', fontWeight: 800, fontSize: '1.2rem', textShadow: turn === 'black' ? '0 0 10px var(--purple)' : 'none' }}>TASKORA AI</div></div><div style={{ display: 'flex', gap: 30, alignItems: 'flex-start' }}><CapturedArea pieces={capturedWhite} title="LOST" /><div style={{ position: 'relative' }}><div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 60px)', border: '6px solid #1a1a2e', borderRadius: 15, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>{board.map((row, r) => row.map((piece, c) => { const isBlackCell = (r + c) % 2 === 1, isSelected = selected && selected[0] === r && selected[1] === c, isValid = validMoves.includes(`${r}-${c}`); return ( <div key={`${r}-${c}`} onClick={() => handleCellClick(r, c)} style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: isSelected ? 'rgba(139, 92, 246, 0.4)' : (isBlackCell ? '#1e1b2e' : '#3c366b'), fontSize: '1.8rem', position: 'relative' }}> {isValid && <div style={{ position: 'absolute', width: 15, height: 15, borderRadius: '50%', background: 'rgba(139, 92, 246, 0.5)' }}></div>} {getPieceIcon(piece)} </div> ) }))}</div>{gameOver && ( <div className="fade-in" style={{ position: 'absolute', inset: -15, background: 'rgba(5, 5, 10, 0.95)', backdropFilter: 'blur(15px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: 20, zIndex: 10, border: '2px solid var(--purple)', boxShadow: '0 0 60px var(--purple-dim)' }}><i className={`fas ${gameOver === 'white' ? 'fa-crown' : 'fa-skull-crossbones'}`} style={{fontSize: '4rem', color: gameOver === 'white' ? 'var(--yellow)' : 'var(--red)', marginBottom: 20}}></i><h2 style={{color: '#fff', fontSize: '2.5rem', fontWeight: 900}}>{gameOver === 'white' ? 'VICTORY!' : 'GAME OVER'}</h2><p style={{color: 'var(--text2)', marginBottom: 20}}>{gameOver === 'white' ? 'You defeated the Taskora AI.' : 'The AI has claimed your kingdom.'}</p><button className="btn btn-primary" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}}>REMATCH</button></div> )}</div><CapturedArea pieces={capturedBlack} title="ENEMY LOST" /></div><button className="btn" onClick={() => {setBoard(initialBoard); setTurn('white'); setGameOver(null); setCapturedWhite([]); setCapturedBlack([]); setSelected(null); setValidMoves([])}} style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', border: '1px solid var(--purple)', marginTop: 10 }}><i className="fas fa-rotate" style={{marginRight: 8}}></i> RESET BOARD</button> </div> )
 }
