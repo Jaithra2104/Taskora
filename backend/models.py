@@ -12,12 +12,25 @@ class DBWrapper:
         self.is_pg = is_pg
 
     def execute(self, sql, params=()):
-        # PostgreSQL uses %s instead of ?
+        is_insert = sql.strip().upper().startswith('INSERT')
+        
         if self.is_pg:
             sql = sql.replace('?', '%s')
+            if is_insert and 'RETURNING' not in sql.upper():
+                sql += ' RETURNING id'
         
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
+        
+        if self.is_pg and is_insert:
+            try:
+                row = cursor.fetchone()
+                if row:
+                    # Patch cursor object to mock lastrowid
+                    cursor.lastrowid = row.get('id') if isinstance(row, dict) else row[0]
+            except Exception:
+                pass
+                
         return cursor
 
     def commit(self):
