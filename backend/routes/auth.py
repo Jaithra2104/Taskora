@@ -187,6 +187,35 @@ def get_profile():
 
 
 
+
+@auth_bp.route('/admin/users', methods=['GET'])
+@jwt_required()
+def admin_get_users():
+    user_id = get_jwt_identity()
+    db = get_db()
+    try:
+        user = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
+        if not user or user['email'] != 'officialtaskora@gmail.com':
+            return jsonify({'error': 'Unauthorized access.'}), 403
+            
+        cursor = db.execute('SELECT id, name, email, created_at FROM users ORDER BY created_at DESC')
+        users = []
+        for row in cursor.fetchall():
+            users.append({
+                'id': row['id'],
+                'name': row['name'],
+                'email': row['email'],
+                'created_at': row['created_at']
+            })
+            
+        return jsonify({'users': users}), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Admin Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+
 @auth_bp.route('/admin/send-bulk-email', methods=['POST'])
 @jwt_required()
 def admin_send_bulk_email():

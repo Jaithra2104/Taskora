@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Admin() {
@@ -8,6 +8,29 @@ export default function Admin() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
+  
+  const [users, setUsers] = useState([])
+  const [usersLoading, setUsersLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await authFetch('/api/auth/admin/users')
+        if (res.ok) {
+          const data = await res.json()
+          setUsers(data.users || [])
+        }
+      } catch (err) {
+        console.error('Failed to fetch users:', err)
+      } finally {
+        setUsersLoading(false)
+      }
+    }
+    
+    if (user && user.email === 'officialtaskora@gmail.com') {
+      fetchUsers()
+    }
+  }, [authFetch, user])
 
   if (!user || user.email !== 'officialtaskora@gmail.com') {
     return (
@@ -54,49 +77,100 @@ export default function Admin() {
         </div>
       </div>
 
-      <div className="card" style={{ maxWidth: '600px', margin: '0 auto', border: '1px solid var(--border-cyan)', boxShadow: 'var(--cyan-glow)' }}>
-        <h3 className="card-title" style={{ marginBottom: 20, color: 'var(--cyan)' }}>New Email Broadcast</h3>
+      <div className="grid-2" style={{ gap: '24px', alignItems: 'start' }}>
+        {/* Broadcast Form */}
+        <div className="card" style={{ border: '1px solid var(--border-cyan)', boxShadow: 'var(--cyan-glow)' }}>
+          <h3 className="card-title" style={{ marginBottom: 20, color: 'var(--cyan)' }}>New Email Broadcast</h3>
 
-        {error && <div className="error-msg" style={{ marginBottom: 16 }}>{error}</div>}
-        {success && (
-          <div style={{ background: 'var(--emerald-dim)', color: 'var(--emerald)', padding: 12, borderRadius: 10, marginBottom: 16, textAlign: 'center', fontWeight: 600 }}>
-            {success}
-          </div>
-        )}
+          {error && <div className="error-msg" style={{ marginBottom: 16 }}>{error}</div>}
+          {success && (
+            <div style={{ background: 'var(--emerald-dim)', color: 'var(--emerald)', padding: 12, borderRadius: 10, marginBottom: 16, textAlign: 'center', fontWeight: 600 }}>
+              {success}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Email Subject</label>
-            <input 
-              className="form-input" 
-              type="text" 
-              placeholder="e.g., Exciting New Features in Taskora! ✨" 
-              required 
-              value={subject} 
-              onChange={(e) => setSubject(e.target.value)} 
-            />
-          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label">Email Subject</label>
+              <input 
+                className="form-input" 
+                type="text" 
+                placeholder="e.g., Exciting New Features in Taskora! ✨" 
+                required 
+                value={subject} 
+                onChange={(e) => setSubject(e.target.value)} 
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Email Body</label>
-            <textarea 
-              className="form-textarea" 
-              style={{ minHeight: '200px' }} 
-              placeholder="Type your message here... Tip: Use {{name}} for personalized greetings." 
-              required 
-              value={body} 
-              onChange={(e) => setBody(e.target.value)} 
-            />
-          </div>
+            <div className="form-group">
+              <label className="form-label">Email Body</label>
+              <textarea 
+                className="form-textarea" 
+                style={{ minHeight: '200px' }} 
+                placeholder="Type your message here... Tip: Use {{name}} for personalized greetings." 
+                required 
+                value={body} 
+                onChange={(e) => setBody(e.target.value)} 
+              />
+            </div>
 
-          <button 
-            className="btn btn-primary w-full" 
-            disabled={loading} 
-            style={{ justifyContent: 'center', height: 48, fontSize: '1rem', marginTop: 10 }}
-          >
-            {loading ? 'DISPATCHING BROADCAST...' : '🚀 SEND BROADCAST →'}
-          </button>
-        </form>
+            <button 
+              className="btn btn-primary w-full" 
+              disabled={loading} 
+              style={{ justifyContent: 'center', height: 48, fontSize: '1rem', marginTop: 10 }}
+            >
+              {loading ? 'DISPATCHING BROADCAST...' : '🚀 SEND BROADCAST →'}
+            </button>
+          </form>
+        </div>
+
+        {/* Registered Users List */}
+        <div className="card" style={{ maxHeight: '600px', display: 'flex', flexDirection: 'column' }}>
+          <h3 className="card-title" style={{ marginBottom: 16 }}>
+            Registered Directory ({users.length})
+          </h3>
+          
+          {usersLoading ? (
+            <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text3)' }}>
+              Synchronizing User Index...
+            </div>
+          ) : users.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text3)' }}>
+              No live users tracked.
+            </div>
+          ) : (
+            <div style={{ overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {users.map((u) => (
+                  <div 
+                    key={u.id} 
+                    style={{ 
+                      padding: '12px 16px', 
+                      background: 'var(--glass)', 
+                      borderRadius: '10px', 
+                      border: '1px solid var(--border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px'
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, color: 'var(--text1)', fontSize: '1rem' }}>
+                      {u.name || 'Anonymous User'}
+                    </div>
+                    <div style={{ color: 'var(--text2)', fontSize: '0.85rem', wordBreak: 'break-all' }}>
+                      {u.email}
+                    </div>
+                    {u.created_at && (
+                      <div style={{ color: 'var(--text3)', fontSize: '0.75rem', marginTop: '4px' }}>
+                        Account Initialized: {new Date(u.created_at).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
