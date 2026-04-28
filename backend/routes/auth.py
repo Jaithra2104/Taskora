@@ -104,6 +104,8 @@ def signup():
             (name, email, hashed_password)
         )
         user_id = cursor.lastrowid
+        
+        db.execute('UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?', (user_id,))
         db.commit()
 
         access_token = create_access_token(identity=str(user_id))
@@ -145,6 +147,9 @@ def login():
         if not user or not check_password_hash(user['password'], password):
             return jsonify({'error': 'Invalid email or password'}), 401
 
+        db.execute('UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?', (user['id'],))
+        db.commit()
+        
         access_token = create_access_token(identity=str(user['id']))
 
         return jsonify({
@@ -439,6 +444,9 @@ def google_callback():
             else:
                 user_id = user['id']
                 
+            db.execute('UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?', (user_id,))
+            db.commit()
+                
             taskora_token = create_access_token(identity=str(user_id))
             return redirect(f"{frontend_url}/oauth-callback?token={taskora_token}")
         finally:
@@ -518,6 +526,9 @@ def github_callback():
                 db.commit()
             else:
                 user_id = user['id']
+                
+            db.execute('UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?', (user_id,))
+            db.commit()
                 
             taskora_token = create_access_token(identity=str(user_id))
             return redirect(f"{frontend_url}/oauth-callback?token={taskora_token}")
