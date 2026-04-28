@@ -288,8 +288,10 @@ def admin_get_stats():
                     'rating': row['rating'],
                     'comment': row['comment']
                 })
-        except Exception:
-            pass
+        except Exception as e:
+            import traceback
+            print(f"Reviews Fetch Exception: {str(e)}")
+            print(traceback.format_exc())
             
         if not reviews:
             reviews = [
@@ -584,7 +586,7 @@ def add_review():
     try:
         db.execute(
             'INSERT INTO reviews (user_id, rating, comment) VALUES (?, ?, ?)',
-            (user_id, rating, comment)
+            (int(user_id), rating, comment)
         )
         db.commit()
         return jsonify({'message': 'Review submitted successfully!'}), 201

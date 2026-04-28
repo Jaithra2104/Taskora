@@ -18,6 +18,15 @@ class DBWrapper:
             sql = sql.replace('?', '%s')
             if is_insert and 'RETURNING' not in sql.upper():
                 sql += ' RETURNING id'
+                
+            # Defensively cast numeric string parameters to int for PostgreSQL strictness
+            new_params = []
+            for p in params:
+                if isinstance(p, str) and p.isdigit():
+                    new_params.append(int(p))
+                else:
+                    new_params.append(p)
+            params = tuple(new_params)
         
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
