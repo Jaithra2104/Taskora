@@ -1,10 +1,12 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, redirect
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import get_db
 import random
 import smtplib
 from email.mime.text import MIMEText
+import os
+import requests
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -182,3 +184,152 @@ def get_profile():
         }), 200
     finally:
         db.close()
+
+
+# ── GOOGLE OAUTH ──
+
+@auth_bp.route('/google', methods=['GET'])
+def google_login():
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    if not google_client_id:
+        return jsonify({'error': 'Google OAuth is not configured on the server.'}), 400
+        
+    redirect_uri = "https://taskora-0n0l.onrender.com/api/auth/google/callback"
+    scope = "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+    
+    google_url = (
+        f"https://accounts.google.com/o/oauth2/v2/auth?"
+        f"client_id={google_client_id}&redirect_uri={redirect_uri}&"
+        f"response_type=code&scope={scope}&access_type=offline&prompt=consent"
+    )
+    return redirect(google_url)
+
+
+@auth_bp.route('/google/callback', methods=['GET'])
+def google_callback():
+    code = request.args.get('code')
+    if not code:
+        return jsonify({'error': 'No code provided'}), 400
+
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    google_client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+    frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+    redirect_uri = "https://taskora-0n0l.onrender.com/api/auth/google/callback"
+
+    token_url = "https://oauth2.googleapis.com/token"
+    payload = {
+        'code': code,
+        'client_id': google_client_id,
+        'client_secret': google_client_secret,
+        'redirect_uri': redirect_uri,
+        'grant_type': 'authorization_code'
+    }
+    
+    try:
+        token_res = requests.post(token_url, data=payload).json()
+        access_token = token_res.get('access_token')
+        
+        info_url = f"https://www.googleapis.com/oauth2/v2/userinfo?access_token={access_token}"
+        user_info = requests.get(info_url).json()
+        
+        email = user_info.get('email')
+        name = user_info.get('name')
+        
+        if not email:
+            return jsonify({'error': 'Email not provided by Google'}), 400
+            
+        db = get_db()
+        try:
+            user = db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()
+            if not user:
+                hashed_pass = generate_password_hash(os.urandom(24).hex())
+                cursor = db.execute(
+                    'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+                    (name, email, hashed_pass)
+                )
+                user_id = cursor.lastrowid
+                db.commit()
+            else:
+                user_id = user['id']
+                
+            taskora_token = create_access_token(identity=str(user_id))
+            return redirect(f"{frontend_url}/oauth-callback?token={taskora_token}")
+        finally:
+            db.close()
+            
+    except Exception as e:
+        return jsonify({'error': f'OAuth Exception: {str(e)}'}), 500
+
+
+# ── GITHUB OAUTH ──
+
+@auth_bp.route('/github', methods=['GET'])
+def github_login():
+    github_client_id = os.environ.get('GITHUB_CLIENT_ID')
+    if not github_client_id:
+        return jsonify({'error': 'GitHub OAuth is not configured on the server.'}), 400
+        
+    redirect_uri = "https://taskora-0n0l.onrender.com/api/auth/github/callback"
+    github_url = f"https://github.com/login/oauth/authorize?client_id={github_client_id}&redirect_uri={redirect_uri}&scope=user:email"
+    
+    return redirect(github_url)
+
+
+@auth_bp.route('/github/callback', methods=['GET'])
+def github_callback():
+    code = request.args.get('code')
+    if not code:
+        return jsonify({'error': 'No code provided'}), 400
+
+    github_client_id = os.environ.get('GITHUB_CLIENT_ID')
+    github_client_secret = os.environ.get('GITHUB_CLIENT_SECRET')
+    frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+    redirect_uri = "https://taskora-0n0l.onrender.com/api/auth/github/callback"
+
+    token_url = "https://github.com/login/oauth/access_token"
+    headers = {'Accept': 'application/json'}
+    payload = {
+        'client_id': github_client_id,
+        'client_secret': github_client_secret,
+        'code': code,
+        'redirect_uri': redirect_uri
+    }
+    
+    try:
+        token_res = requests.post(token_url, headers=headers, data=payload).json()
+        access_token = token_res.get('access_token')
+        
+        user_url = "https://api.github.com/user"
+        user_headers = {'Authorization': f'token {access_token}'}
+        user_info = requests.get(user_url, headers=user_headers).json()
+        
+        email = user_info.get('email')
+        if not email:
+            email_url = "https://api.github.com/user/emails"
+            emails_res = requests.get(email_url, headers=user_headers).json()
+            primary_email = next((e['email'] for e in emails_res if e.get('primary')), None)
+            email = primary_email if primary_email else emails_res[0]['email']
+            
+        name = user_info.get('name') or user_info.get('login')
+        
+        db = get_db()
+        try:
+            user = db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()
+            if not user:
+                hashed_pass = generate_password_hash(os.urandom(24).hex())
+                cursor = db.execute(
+                    'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+                    (name, email, hashed_pass)
+                )
+                user_id = cursor.lastrowid
+                db.commit()
+            else:
+                user_id = user['id']
+                
+            taskora_token = create_access_token(identity=str(user_id))
+            return redirect(f"{frontend_url}/oauth-callback?token={taskora_token}")
+        finally:
+            db.close()
+            
+    except Exception as e:
+        return jsonify({'error': f'OAuth Exception: {str(e)}'}), 500

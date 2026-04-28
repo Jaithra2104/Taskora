@@ -13,6 +13,7 @@ import StudyAssistant from './pages/StudyAssistant'
 
 import Profile from './pages/Profile'
 import Games from './pages/Games'
+import OAuthCallback from './pages/OAuthCallback'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -51,6 +52,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/" /> : <Signup />} />
+      <Route path="/oauth-callback" element={<OAuthCallback />} />
       <Route path="/" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
       <Route path="/timetable" element={<ProtectedRoute><AppLayout><Timetable /></AppLayout></ProtectedRoute>} />
       <Route path="/homework" element={<ProtectedRoute><AppLayout><Homework /></AppLayout></ProtectedRoute>} />
