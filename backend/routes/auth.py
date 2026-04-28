@@ -197,18 +197,20 @@ def get_profile():
 @auth_bp.route('/admin/users', methods=['GET'])
 @jwt_required()
 def admin_get_users():
-    user_id = get_jwt_identity()
     db = get_db()
     try:
-        cursor = db.execute('SELECT id, name, email, created_at, last_active FROM users ORDER BY created_at DESC')
+        cursor = db.execute('SELECT * FROM users ORDER BY created_at DESC')
         users = []
         for row in cursor.fetchall():
+            is_dict = isinstance(row, dict)
+            keys = row.keys() if is_dict else [k for k in row.keys()]
+            
             users.append({
                 'id': row['id'],
                 'name': row['name'],
                 'email': row['email'],
                 'created_at': row['created_at'],
-                'last_active': row['last_active'] if 'last_active' in [k for k in row.keys()] else None
+                'last_active': row['last_active'] if 'last_active' in keys else None
             })
             
         return jsonify({'users': users}), 200
@@ -224,15 +226,24 @@ def admin_get_users():
 def admin_get_stats():
     db = get_db()
     try:
-        total_users = db.execute('SELECT COUNT(*) as count FROM users').fetchone()['count']
-        total_tasks = db.execute('SELECT COUNT(*) as count FROM homework').fetchone()['count']
-        total_tasks += db.execute('SELECT COUNT(*) as count FROM assignments').fetchone()['count']
-        total_syllabus = db.execute('SELECT COUNT(*) as count FROM syllabus').fetchone()['count']
-        total_reminders = db.execute('SELECT COUNT(*) as count FROM reminders').fetchone()['count']
+        def get_count(table):
+            try:
+                row = db.execute(f'SELECT COUNT(*) as count FROM {table}').fetchone()
+                if isinstance(row, dict):
+                    return row.get('count', 0)
+                return row[0] if row else 0
+            except Exception:
+                return 0
+
+        total_users = get_count('users')
+        total_homework = get_count('homework')
+        total_assignments = get_count('assignments')
+        total_syllabus = get_count('syllabus')
+        total_reminders = get_count('reminders')
         
         return jsonify({
             'total_users': total_users,
-            'total_tasks': total_tasks,
+            'total_tasks': total_homework + total_assignments,
             'total_syllabus': total_syllabus,
             'total_reminders': total_reminders,
             'reviews': [
