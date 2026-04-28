@@ -197,8 +197,14 @@ def get_profile():
 @auth_bp.route('/admin/users', methods=['GET'])
 @jwt_required()
 def admin_get_users():
+    user_id = get_jwt_identity()
     db = get_db()
     try:
+        user = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
+        email = user.get('email') if isinstance(user, dict) else user['email'] if user else None
+        if email != 'officialtaskora@gmail.com':
+            return jsonify({'error': 'Unauthorized access.'}), 403
+            
         cursor = db.execute('SELECT * FROM users ORDER BY created_at DESC')
         users = []
         for row in cursor.fetchall():
@@ -224,8 +230,13 @@ def admin_get_users():
 @auth_bp.route('/admin/stats', methods=['GET'])
 @jwt_required()
 def admin_get_stats():
+    user_id = get_jwt_identity()
     db = get_db()
     try:
+        user = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
+        email = user.get('email') if isinstance(user, dict) else user['email'] if user else None
+        if email != 'officialtaskora@gmail.com':
+            return jsonify({'error': 'Unauthorized access.'}), 403
         def get_count(table):
             try:
                 row = db.execute(f'SELECT COUNT(*) as count FROM {table}').fetchone()
@@ -265,7 +276,10 @@ def admin_send_bulk_email():
     user_id = get_jwt_identity()
     db = get_db()
     try:
-        pass
+        user = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
+        email = user.get('email') if isinstance(user, dict) else user['email'] if user else None
+        if email != 'officialtaskora@gmail.com':
+            return jsonify({'error': 'Unauthorized access.'}), 403
             
         data = request.get_json()
         if not data:

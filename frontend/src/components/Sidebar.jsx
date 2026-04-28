@@ -24,7 +24,7 @@ export default function Sidebar() {
   const initials = user?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'U'
 
   const navItems = [...NAV]
-  if (user) {
+  if (user && user.email === 'officialtaskora@gmail.com') {
     navItems.push({ path: '/admin', label: 'Admin Panel', icon: 'fa-user-shield' })
   }
 

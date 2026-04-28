@@ -75,10 +75,10 @@ export default function Admin() {
     }
   }, [authFetch, user])
 
-  if (!user) {
+  if (!user || user.email !== 'officialtaskora@gmail.com') {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <div className="error-msg">⚠ Unauthorized Access. Please log in.</div>
+        <div className="error-msg">⚠ Unauthorized Access. Admin privileges required.</div>
       </div>
     )
   }
