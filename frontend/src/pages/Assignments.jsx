@@ -56,7 +56,7 @@ export default function Assignments() {
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>+ Add Assignment</button>
       </div>
 
-      {loading ? <div className="empty-state"><p>Loading...</p></div>
+      {loading ? <div className="quantum-loader-container"><div className="quantum-spinner"></div><div className="quantum-loader-text">Loading...</div></div>
       : items.length === 0 ? (
         <div className="empty-state"><div className="icon">⏰</div><h3>No assignments yet</h3><p>Add your first assignment to start tracking</p></div>
       ) : (

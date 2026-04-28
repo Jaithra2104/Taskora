@@ -122,7 +122,7 @@ export default function Timetable() {
         <strong>CSV format:</strong>&nbsp;<code>day, subject, start_time, end_time, room</code>
       </div>
 
-      {loading ? <div className="empty-state"><p>Loading...</p></div> : (
+      {loading ? <div className="quantum-loader-container"><div className="quantum-spinner"></div><div className="quantum-loader-text">Loading...</div></div> : (
 
         view === 'grid' ? (
           /* ── COMPACT HORIZONTAL GRID ── */

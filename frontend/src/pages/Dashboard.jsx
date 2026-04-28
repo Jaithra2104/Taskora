@@ -85,9 +85,11 @@ export default function Dashboard() {
   const openHWModal = (subject) => { setHwForm({ subject, description: '', due_date: '' }); setHwModal(subject) }
 
   if (loading) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', gap: 20 }}>
-      <div style={{ width: 56, height: 56, borderRadius: '50%', border: '4px solid var(--cyan)', borderTopColor: 'transparent', animation: 'spin .8s linear infinite', boxShadow: 'var(--cyan-glow)' }} />
-      <p style={{ color: 'var(--text2)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.05em' }}>WAKING UP TASKORA...</p>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+      <div className="quantum-loader-container">
+        <div className="quantum-spinner"></div>
+        <div className="quantum-loader-text">WAKING UP TASKORA...</div>
+      </div>
     </div>
   )
 

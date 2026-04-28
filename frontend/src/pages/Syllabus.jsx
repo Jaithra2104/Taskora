@@ -65,7 +65,7 @@ export default function Syllabus() {
         </div>
       )}
 
-      {loading ? <div className="empty-state"><p>Loading...</p></div>
+      {loading ? <div className="quantum-loader-container"><div className="quantum-spinner"></div><div className="quantum-loader-text">Loading...</div></div>
       : syllabus.length === 0 ? (
         <div className="empty-state"><div className="icon">◉</div><h3>No subjects yet</h3><p>Add your subjects and topics to track progress</p></div>
       ) : (

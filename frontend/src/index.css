@@ -184,16 +184,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
   padding: 20px;
   position: relative;
   overflow: hidden;
-  background-image: url('/auth-bg.png');
-  background-size: cover;
-  background-position: center;
+  background: linear-gradient(-45deg, #030712, #0f172a, #080c1d, #1a0b2e);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 .auth-container::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(7, 11, 18, 0.4), rgba(7, 11, 18, 0.9));
+  background: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05), rgba(7, 11, 18, 0.9));
   z-index: 0;
+  pointer-events: none;
 }
 .auth-card {
   background: rgba(12, 17, 33, 0.75);
@@ -301,6 +307,52 @@ a{color:var(--cyan);text-decoration:none}
 @keyframes glow{0%,100%{box-shadow:0 0 10px rgba(6,182,212,0.3)}50%{box-shadow:0 0 25px rgba(6,182,212,0.6)}}
 .fade-in{animation:fadeIn .4s ease}
 .slide-up{animation:slideUp .4s ease}
+
+/* ── QUANTUM LOADER ── */
+.quantum-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+  width: 100%;
+}
+.quantum-spinner {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  position: relative;
+  animation: spin 2s linear infinite;
+}
+.quantum-spinner::before, .quantum-spinner::after {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+}
+.quantum-spinner::before {
+  border-top-color: var(--cyan);
+  border-right-color: var(--cyan);
+  animation: spin 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+.quantum-spinner::after {
+  border-bottom-color: var(--purple);
+  border-left-color: var(--purple);
+  animation: spin 2.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite reverse;
+}
+.quantum-loader-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  background: var(--grad-cyan);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  animation: pulse 1.5s ease-in-out infinite;
+}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px}

@@ -109,7 +109,14 @@ export default function Profile() {
     return `https://${url}`
   }
 
-  if (loading) return <div className="text-center mt-24">Loading Profile...</div>
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+      <div className="quantum-loader-container">
+        <div className="quantum-spinner"></div>
+        <div className="quantum-loader-text">Loading Profile...</div>
+      </div>
+    </div>
+  )
 
   const profileImg = form.profile_pic ? (form.profile_pic.startsWith('http') ? form.profile_pic : `${API_BASE_URL}${form.profile_pic}`) : null
 

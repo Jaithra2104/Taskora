@@ -16,7 +16,14 @@ import Games from './pages/Games'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
-  if (loading) return <div className="auth-container"><div className="card"><p>Loading...</p></div></div>
+  if (loading) return (
+    <div className="auth-container">
+      <div className="card quantum-loader-container" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
+        <div className="quantum-spinner"></div>
+        <div className="quantum-loader-text">Initializing...</div>
+      </div>
+    </div>
+  )
   return user ? children : <Navigate to="/login" />
 }
 
@@ -31,7 +38,14 @@ function AppLayout({ children }) {
 
 function AppRoutes() {
   const { user, loading } = useAuth()
-  if (loading) return <div className="auth-container"><p style={{color:'#9ca3af'}}>Loading...</p></div>
+  if (loading) return (
+    <div className="auth-container">
+      <div className="quantum-loader-container">
+        <div className="quantum-spinner"></div>
+        <div className="quantum-loader-text">Loading...</div>
+      </div>
+    </div>
+  )
 
   return (
     <Routes>

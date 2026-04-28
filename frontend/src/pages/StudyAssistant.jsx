@@ -187,7 +187,10 @@ export default function StudyAssistant() {
               )}
 
               {loading ? (
-                <div className="empty-state"><p>Searching YouTube...</p></div>
+                <div className="quantum-loader-container">
+                  <div className="quantum-spinner"></div>
+                  <div className="quantum-loader-text">Searching YouTube...</div>
+                </div>
               ) : videos.length === 0 ? (
                 <div className="card" style={{ marginBottom:24 }}>
                   <p style={{ color:'var(--text2)', fontSize:'.875rem' }}>No videos found for this topic.</p>

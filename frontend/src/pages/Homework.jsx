@@ -72,7 +72,7 @@ export default function Homework() {
         ))}
       </div>
 
-      {loading ? <div className="empty-state"><p>Loading...</p></div>
+      {loading ? <div className="quantum-loader-container"><div className="quantum-spinner"></div><div className="quantum-loader-text">Loading...</div></div>
       : filtered.length === 0 ? (
         <div className="empty-state"><div className="icon">✎</div><h3>Nothing here</h3><p>Add your homework to track it</p></div>
       ) : (
