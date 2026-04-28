@@ -132,7 +132,7 @@ export default function Admin() {
       </div>
 
       {/* Dashboard Stats Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+      <div className="admin-stats-grid">
         <div className="card" style={{ background: 'var(--glass)', border: '1px solid var(--border)', padding: '20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div style={{ fontSize: '2rem', background: 'rgba(0, 242, 254, 0.1)', color: 'var(--cyan)', width: '60px', height: '60px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <i className="fas fa-users"></i>
@@ -255,14 +255,12 @@ export default function Admin() {
                   {onlineUsers.map((u) => (
                     <div 
                       key={u.id} 
+                      className="admin-user-row"
                       style={{ 
                         padding: '12px 16px', 
                         background: 'rgba(16, 185, 129, 0.05)', 
                         borderRadius: '10px', 
-                        border: '1px solid rgba(16, 185, 129, 0.2)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
+                        border: '1px solid rgba(16, 185, 129, 0.2)'
                       }}
                     >
                       <div>
@@ -301,14 +299,12 @@ export default function Admin() {
                     return (
                       <div 
                         key={u.id} 
+                        className="admin-user-row"
                         style={{ 
                           padding: '12px 16px', 
                           background: 'var(--glass)', 
                           borderRadius: '10px', 
-                          border: '1px solid var(--border)',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center'
+                          border: '1px solid var(--border)'
                         }}
                       >
                         <div>
