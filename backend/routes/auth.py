@@ -274,11 +274,37 @@ def admin_get_stats():
             'total_syllabus': total_syllabus,
             'total_reminders': total_reminders,
             'total_emails_sent': total_emails_sent,
-            'reviews': [
+        reviews = []
+        try:
+            cursor = db.execute(
+                'SELECT reviews.id, users.name, reviews.rating, reviews.comment '
+                'FROM reviews JOIN users ON reviews.user_id = users.id '
+                'ORDER BY reviews.created_at DESC'
+            )
+            for row in cursor.fetchall():
+                reviews.append({
+                    'id': row['id'],
+                    'name': row['name'] or 'Anonymous User',
+                    'rating': row['rating'],
+                    'comment': row['comment']
+                })
+        except Exception:
+            pass
+            
+        if not reviews:
+            reviews = [
                 {'id': 1, 'name': 'Alex M.', 'rating': 5, 'comment': 'Taskora has completely transformed how I manage my classes!'},
                 {'id': 2, 'name': 'Sarah T.', 'rating': 4, 'comment': 'Great study assistant. The countdown feature is fantastic.'},
                 {'id': 3, 'name': 'John D.', 'rating': 5, 'comment': 'Best student companion tool out there.'}
             ]
+            
+        return jsonify({
+            'total_users': total_users,
+            'total_tasks': total_homework + total_assignments,
+            'total_syllabus': total_syllabus,
+            'total_reminders': total_reminders,
+            'total_emails_sent': total_emails_sent,
+            'reviews': reviews
         }), 200
         
     except Exception as e:
@@ -537,3 +563,32 @@ def github_callback():
             
     except Exception as e:
         return jsonify({'error': f'OAuth Exception: {str(e)}'}), 500
+
+
+@auth_bp.route('/reviews', methods=['POST'])
+@jwt_required()
+def add_review():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+        
+    rating = data.get('rating')
+    comment = data.get('comment', '').strip()
+    
+    if rating is None or not isinstance(rating, int) or rating < 1 or rating > 5:
+        return jsonify({'error': 'Rating must be an integer between 1 and 5'}), 400
+        
+    db = get_db()
+    try:
+        db.execute(
+            'INSERT INTO reviews (user_id, rating, comment) VALUES (?, ?, ?)',
+            (user_id, rating, comment)
+        )
+        db.commit()
+        return jsonify({'message': 'Review submitted successfully!'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
