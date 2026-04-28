@@ -2,7 +2,9 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext(null)
 
-const API_BASE_URL = "https://taskora-0n0l.onrender.com"
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? "http://127.0.0.1:5000"
+  : "https://taskora-0n0l.onrender.com"
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
