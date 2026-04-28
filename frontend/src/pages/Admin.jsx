@@ -113,11 +113,26 @@ export default function Admin() {
 
   const isOnline = (lastActive) => {
     if (!lastActive) return false;
-    // Handle 'YYYY-MM-DD HH:MM:SS' format from SQLite
-    const activeDate = new Date(lastActive.replace(' ', 'T') + 'Z');
-    const now = new Date();
-    const diffMins = Math.abs(now - activeDate) / (1000 * 60);
-    return diffMins < 5; 
+    try {
+      let activeDate;
+      if (typeof lastActive === 'string') {
+        if (lastActive.includes('T')) {
+          activeDate = new Date(lastActive);
+        } else {
+          activeDate = new Date(lastActive.replace(' ', 'T') + 'Z');
+        }
+      } else {
+        activeDate = new Date(lastActive);
+      }
+      
+      if (isNaN(activeDate.getTime())) return false;
+      
+      const now = new Date();
+      const diffMins = Math.abs(now - activeDate) / (1000 * 60);
+      return diffMins < 15; // Relax tolerance slightly for background sync gaps
+    } catch (err) {
+      return false;
+    }
   }
 
   const onlineUsers = users.filter(u => isOnline(u.last_active));
