@@ -214,6 +214,12 @@ def google_callback():
     google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
     google_client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
     frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+    if 'https://' in frontend_url:
+        frontend_url = 'https://' + frontend_url.split('https://')[-1].strip('/')
+    elif 'http://' in frontend_url:
+        frontend_url = 'http://' + frontend_url.split('http://')[-1].strip('/')
+    else:
+        frontend_url = 'https://' + frontend_url.strip('/')
     redirect_uri = "https://taskora-0n0l.onrender.com/api/auth/google/callback"
 
     token_url = "https://oauth2.googleapis.com/token"
@@ -284,6 +290,12 @@ def github_callback():
     github_client_id = os.environ.get('GITHUB_CLIENT_ID')
     github_client_secret = os.environ.get('GITHUB_CLIENT_SECRET')
     frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+    if 'https://' in frontend_url:
+        frontend_url = 'https://' + frontend_url.split('https://')[-1].strip('/')
+    elif 'http://' in frontend_url:
+        frontend_url = 'http://' + frontend_url.split('http://')[-1].strip('/')
+    else:
+        frontend_url = 'https://' + frontend_url.strip('/')
     redirect_uri = "https://taskora-0n0l.onrender.com/api/auth/github/callback"
 
     token_url = "https://github.com/login/oauth/access_token"
