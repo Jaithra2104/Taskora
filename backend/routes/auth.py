@@ -2,9 +2,44 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import get_db
+import random
+import smtplib
+from email.mime.text import MIMEText
 
 auth_bp = Blueprint('auth', __name__)
 
+otp_store = {}
+
+@auth_bp.route('/send-otp', methods=['POST'])
+def send_otp():
+    """Send an OTP for email verification."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    email = data.get('email', '').strip().lower()
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    db = get_db()
+    try:
+        existing = db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()
+        if existing:
+            return jsonify({'error': 'Email already registered'}), 409
+    finally:
+        db.close()
+
+    otp = str(random.randint(100000, 999999))
+    otp_store[email] = otp
+
+    # Demo mode: print to console
+    print(f"\n{'='*40}")
+    print(f"🔐 MOCK EMAIL SENT")
+    print(f"To: {email}")
+    print(f"OTP CODE: {otp}")
+    print(f"{'='*40}\n")
+
+    return jsonify({'message': 'OTP sent successfully. Check your terminal for the demo code.'}), 200
 
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
@@ -17,12 +52,18 @@ def signup():
     name = data.get('name', '').strip()
     email = data.get('email', '').strip().lower()
     password = data.get('password', '')
+    otp = data.get('otp', '').strip()
 
-    if not name or not email or not password:
-        return jsonify({'error': 'Name, email, and password are required'}), 400
+    if not name or not email or not password or not otp:
+        return jsonify({'error': 'Name, email, password, and OTP are required'}), 400
 
     if len(password) < 6:
         return jsonify({'error': 'Password must be at least 6 characters'}), 400
+
+    # Verify OTP
+    stored_otp = otp_store.get(email)
+    if not stored_otp or stored_otp != otp:
+        return jsonify({'error': 'Invalid or expired OTP'}), 400
 
     db = get_db()
     try:
@@ -39,6 +80,10 @@ def signup():
 
         user_id = cursor.lastrowid
         access_token = create_access_token(identity=str(user_id))
+
+        # Clear OTP after successful registration
+        if email in otp_store:
+            del otp_store[email]
 
         return jsonify({
             'message': 'Account created successfully',
