@@ -32,14 +32,39 @@ def send_otp():
     otp = str(random.randint(100000, 999999))
     otp_store[email] = otp
 
-    # Demo mode: print to console
-    print(f"\n{'='*40}")
-    print(f"🔐 MOCK EMAIL SENT")
-    print(f"To: {email}")
-    print(f"OTP CODE: {otp}")
-    print(f"{'='*40}\n")
+    import os
+    email_user = os.environ.get('EMAIL_USER')
+    email_pass = os.environ.get('EMAIL_PASS')
 
-    return jsonify({'message': 'OTP sent successfully. Check your terminal for the demo code.'}), 200
+    if email_user and email_pass:
+        try:
+            msg = MIMEText(f"Welcome to Taskora!\n\nYour verification code is: {otp}\n\nPlease enter this code on the signup page to complete your account creation.")
+            msg['Subject'] = 'Taskora - Email Verification'
+            msg['From'] = email_user
+            msg['To'] = email
+
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(email_user, email_pass)
+            server.send_message(msg)
+            server.quit()
+            
+            return jsonify({'message': 'OTP sent successfully to your email!'}), 200
+        except Exception as e:
+            print(f"SMTP Error: {str(e)}")
+            return jsonify({'error': f'Failed to send email: {str(e)}'}), 500
+    else:
+        # Fallback for demo purposes
+        print(f"\n{'='*40}")
+        print(f"🔐 MOCK EMAIL SENT (No SMTP Configured)")
+        print(f"To: {email}")
+        print(f"OTP CODE: {otp}")
+        print(f"{'='*40}\n")
+
+        return jsonify({
+            'message': 'Demo mode active (No SMTP credentials set in backend environment).',
+            'otp_for_demo': otp
+        }), 200
 
 @auth_bp.route('/signup', methods=['POST'])
 def signup():

@@ -28,6 +28,10 @@ export default function Signup() {
       try { data = await res.json(); } catch (err) { throw new Error('Unable to connect to server.'); }
       if (!res.ok) throw new Error(data.error || 'Failed to send OTP')
       
+      if (data.otp_for_demo) {
+        setForm(prev => ({ ...prev, otp: data.otp_for_demo }));
+      }
+      
       setStep(2) // Move to OTP step
     } catch (err) {
       setError(err.message)
