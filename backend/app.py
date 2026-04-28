@@ -165,7 +165,16 @@ def handle_exception(e):
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    return jsonify({'status': 'ok', 'message': 'Taskora API is running'}), 200
+    from models import get_db
+    db_type = 'Unknown'
+    try:
+        db = get_db()
+        db_type = 'PostgreSQL/Supabase' if db.is_pg else 'SQLite'
+        db.close()
+    except Exception as e:
+        db_type = f'Error: {str(e)}'
+        
+    return jsonify({'status': 'ok', 'message': 'Taskora API is running', 'database': db_type}), 200
 
 
 @app.route('/')
