@@ -202,7 +202,7 @@ def admin_get_users():
     try:
         user = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
         email = user.get('email') if isinstance(user, dict) else user['email'] if user else None
-        if email != 'officialtaskora@gmail.com':
+        if not email or email.strip().lower() != 'officialtaskora@gmail.com':
             return jsonify({'error': 'Unauthorized access.'}), 403
             
         cursor = db.execute('SELECT * FROM users ORDER BY created_at DESC')
@@ -222,7 +222,8 @@ def admin_get_users():
         return jsonify({'users': users}), 200
         
     except Exception as e:
-        return jsonify({'error': f'Admin Error: {str(e)}'}), 500
+        import traceback
+        return jsonify({'error': f'Admin Error: {str(e)}', 'traceback': traceback.format_exc()}), 500
     finally:
         db.close()
 
@@ -235,7 +236,7 @@ def admin_get_stats():
     try:
         user = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
         email = user.get('email') if isinstance(user, dict) else user['email'] if user else None
-        if email != 'officialtaskora@gmail.com':
+        if not email or email.strip().lower() != 'officialtaskora@gmail.com':
             return jsonify({'error': 'Unauthorized access.'}), 403
         def get_count(table):
             try:
@@ -265,7 +266,8 @@ def admin_get_stats():
         }), 200
         
     except Exception as e:
-        return jsonify({'error': f'Admin Error: {str(e)}'}), 500
+        import traceback
+        return jsonify({'error': f'Admin Error: {str(e)}', 'traceback': traceback.format_exc()}), 500
     finally:
         db.close()
 
@@ -278,7 +280,7 @@ def admin_send_bulk_email():
     try:
         user = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
         email = user.get('email') if isinstance(user, dict) else user['email'] if user else None
-        if email != 'officialtaskora@gmail.com':
+        if not email or email.strip().lower() != 'officialtaskora@gmail.com':
             return jsonify({'error': 'Unauthorized access.'}), 403
             
         data = request.get_json()
