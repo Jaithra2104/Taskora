@@ -76,7 +76,8 @@ def init_db():
         ("linkedin", "TEXT"),
         ("github", "TEXT"),
         ("profile_pic", "TEXT"),
-        ("bio", "TEXT")
+        ("bio", "TEXT"),
+        ("last_active", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     ]
     
     for field, ftype in user_fields:
