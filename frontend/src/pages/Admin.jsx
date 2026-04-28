@@ -1,6 +1,35 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 
+const getActiveTime = (createdAt) => {
+  if (!createdAt) return 'N/A'
+  const createdDate = new Date(createdAt)
+  const now = new Date()
+  const diffTime = Math.abs(now - createdDate)
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 0) {
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60))
+    if (diffHours === 0) {
+      const diffMins = Math.floor(diffTime / (1000 * 60))
+      return `${diffMins} min${diffMins !== 1 ? 's' : ''}`
+    }
+    return `${diffHours} hr${diffHours !== 1 ? 's' : ''}`
+  }
+  
+  if (diffDays >= 365) {
+    const years = Math.floor(diffDays / 365)
+    return `${years} yr${years !== 1 ? 's' : ''}`
+  }
+  
+  if (diffDays >= 30) {
+    const months = Math.floor(diffDays / 30)
+    return `${months} month${months !== 1 ? 's' : ''}`
+  }
+  
+  return `${diffDays} day${diffDays !== 1 ? 's' : ''}`
+}
+
 export default function Admin() {
   const { user, authFetch } = useAuth()
   const [subject, setSubject] = useState('')
@@ -161,8 +190,9 @@ export default function Admin() {
                       {u.email}
                     </div>
                     {u.created_at && (
-                      <div style={{ color: 'var(--text3)', fontSize: '0.75rem', marginTop: '4px' }}>
-                        Account Initialized: {new Date(u.created_at).toLocaleDateString()}
+                      <div style={{ color: 'var(--text3)', fontSize: '0.75rem', marginTop: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                        <span>Joined: {new Date(u.created_at).toLocaleDateString()}</span>
+                        <span style={{ color: 'var(--cyan)', fontWeight: 600 }}>Active for: {getActiveTime(u.created_at)}</span>
                       </div>
                     )}
                   </div>
