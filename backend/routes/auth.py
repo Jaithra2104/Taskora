@@ -101,9 +101,9 @@ def signup():
             'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
             (name, email, hashed_password)
         )
+        user_id = cursor.lastrowid
         db.commit()
 
-        user_id = cursor.lastrowid
         access_token = create_access_token(identity=str(user_id))
 
         # Clear OTP after successful registration
