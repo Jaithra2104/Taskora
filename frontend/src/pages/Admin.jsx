@@ -132,35 +132,132 @@ export default function Admin() {
       </div>
 
       {/* Dashboard Stats Row */}
-      <div className="admin-stats-grid">
-        <div className="card" style={{ background: 'var(--glass)', border: '1px solid var(--border)', padding: '20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ fontSize: '2rem', background: 'rgba(0, 242, 254, 0.1)', color: 'var(--cyan)', width: '60px', height: '60px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="admin-stats-grid" style={{ marginBottom: '40px' }}>
+        {/* Total Users */}
+        <div className="card" style={{ 
+          background: 'linear-gradient(135deg, rgba(0, 242, 254, 0.05), rgba(8, 12, 29, 0.8))', 
+          border: '1px solid rgba(0, 242, 254, 0.15)', 
+          padding: '24px', 
+          borderRadius: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '20px',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5)'
+        }}>
+          <div style={{ 
+            fontSize: '2.2rem', 
+            background: 'rgba(0, 242, 254, 0.12)', 
+            color: 'var(--cyan)', 
+            width: '64px', 
+            height: '64px', 
+            borderRadius: '14px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            boxShadow: '0 0 20px rgba(0, 242, 254, 0.15)'
+          }}>
             <i className="fas fa-users"></i>
           </div>
           <div>
-            <div style={{ color: 'var(--text3)', fontSize: '0.9rem', fontWeight: 500 }}>Total Users</div>
-            <div style={{ color: 'var(--text1)', fontSize: '1.8rem', fontWeight: 800 }}>{stats.total_users || users.length}</div>
+            <div style={{ color: 'var(--text2)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Total Users</div>
+            <div style={{ color: '#FFFFFF', fontSize: '2.2rem', fontWeight: 900, marginTop: '4px', textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}>{stats.total_users || users.length}</div>
           </div>
         </div>
 
-        <div className="card" style={{ background: 'var(--glass)', border: '1px solid var(--border)', padding: '20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ fontSize: '2rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--emerald)', width: '60px', height: '60px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* User Reviews */}
+        <div className="card" style={{ 
+          background: 'linear-gradient(135deg, rgba(16, 255, 157, 0.05), rgba(8, 12, 29, 0.8))', 
+          border: '1px solid rgba(16, 255, 157, 0.15)', 
+          padding: '24px', 
+          borderRadius: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '20px',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5)'
+        }}>
+          <div style={{ 
+            fontSize: '2.2rem', 
+            background: 'rgba(16, 255, 157, 0.12)', 
+            color: 'var(--emerald)', 
+            width: '64px', 
+            height: '64px', 
+            borderRadius: '14px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            boxShadow: '0 0 20px rgba(16, 255, 157, 0.15)'
+          }}>
             <i className="fas fa-star"></i>
           </div>
           <div>
-            <div style={{ color: 'var(--text3)', fontSize: '0.9rem', fontWeight: 500 }}>User Reviews</div>
-            <div style={{ color: 'var(--text1)', fontSize: '1.8rem', fontWeight: 800 }}>{stats.reviews?.length || 0}</div>
+            <div style={{ color: 'var(--text2)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>User Reviews</div>
+            <div style={{ color: '#FFFFFF', fontSize: '2.2rem', fontWeight: 900, marginTop: '4px', textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}>{stats.reviews?.length || 0}</div>
           </div>
         </div>
 
-        <div className="card" style={{ background: 'var(--glass)', border: '1px solid var(--border)', padding: '20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ fontSize: '2rem', background: 'rgba(139, 92, 246, 0.1)', color: 'var(--purple)', width: '60px', height: '60px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Broadcast Emails */}
+        <div className="card" style={{ 
+          background: 'linear-gradient(135deg, rgba(255, 184, 0, 0.05), rgba(8, 12, 29, 0.8))', 
+          border: '1px solid rgba(255, 184, 0, 0.15)', 
+          padding: '24px', 
+          borderRadius: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '20px',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5)'
+        }}>
+          <div style={{ 
+            fontSize: '2.2rem', 
+            background: 'rgba(255, 184, 0, 0.12)', 
+            color: 'var(--amber)', 
+            width: '64px', 
+            height: '64px', 
+            borderRadius: '14px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            boxShadow: '0 0 20px rgba(255, 184, 0, 0.15)'
+          }}>
+            <i className="fas fa-envelope-open-text"></i>
+          </div>
+          <div>
+            <div style={{ color: 'var(--text2)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Sent Emails</div>
+            <div style={{ color: '#FFFFFF', fontSize: '2.2rem', fontWeight: 900, marginTop: '4px', textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}>{stats.total_emails_sent || 0}</div>
+          </div>
+        </div>
+
+        {/* Project Stats */}
+        <div className="card" style={{ 
+          background: 'linear-gradient(135deg, rgba(191, 119, 255, 0.05), rgba(8, 12, 29, 0.8))', 
+          border: '1px solid rgba(191, 119, 255, 0.15)', 
+          padding: '24px', 
+          borderRadius: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '20px',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5)'
+        }}>
+          <div style={{ 
+            fontSize: '2.2rem', 
+            background: 'rgba(191, 119, 255, 0.12)', 
+            color: 'var(--purple)', 
+            width: '64px', 
+            height: '64px', 
+            borderRadius: '14px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            boxShadow: '0 0 20px rgba(191, 119, 255, 0.15)'
+          }}>
             <i className="fas fa-chart-line"></i>
           </div>
           <div>
-            <div style={{ color: 'var(--text3)', fontSize: '0.9rem', fontWeight: 500 }}>Project Stats</div>
-            <div style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>
-              Tasks: <strong style={{ color: 'var(--cyan)' }}>{stats.total_tasks || 0}</strong> | Topics: <strong style={{ color: 'var(--cyan)' }}>{stats.total_syllabus || 0}</strong>
+            <div style={{ color: 'var(--text2)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Project Analytics</div>
+            <div style={{ color: 'var(--text1)', fontSize: '0.95rem', fontWeight: 700, marginTop: '6px' }}>
+              Tasks: <strong style={{ color: 'var(--cyan)' }}>{stats.total_tasks || 0}</strong>
+            </div>
+            <div style={{ color: 'var(--text1)', fontSize: '0.95rem', fontWeight: 700, marginTop: '2px' }}>
+              Topics: <strong style={{ color: 'var(--purple)' }}>{stats.total_syllabus || 0}</strong>
             </div>
           </div>
         </div>

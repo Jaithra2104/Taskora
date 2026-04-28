@@ -70,7 +70,8 @@ def init_db():
         f"CREATE TABLE IF NOT EXISTS certificates (id {id_type} {pk}, user_id INTEGER NOT NULL, title TEXT NOT NULL, category TEXT DEFAULT 'general', file_url TEXT NOT NULL, file_name TEXT NOT NULL, issued_date TEXT, description TEXT DEFAULT '', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
         f"CREATE TABLE IF NOT EXISTS syllabus (id {id_type} {pk}, user_id INTEGER NOT NULL, subject TEXT NOT NULL, topic TEXT NOT NULL, status INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
         f"CREATE TABLE IF NOT EXISTS reminders (id {id_type} {pk}, user_id INTEGER NOT NULL, type TEXT NOT NULL, message TEXT NOT NULL, trigger_time TEXT NOT NULL, is_sent INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
-        f"CREATE TABLE IF NOT EXISTS notes (id {id_type} {pk}, user_id INTEGER NOT NULL, video_id TEXT NOT NULL, topic TEXT, content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+        f"CREATE TABLE IF NOT EXISTS notes (id {id_type} {pk}, user_id INTEGER NOT NULL, video_id TEXT NOT NULL, topic TEXT, content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+        f"CREATE TABLE IF NOT EXISTS email_logs (id {id_type} {pk}, subject TEXT NOT NULL, recipients_count INTEGER NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
     ]
 
     for table_sql in tables:

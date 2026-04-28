@@ -253,11 +253,22 @@ def admin_get_stats():
         total_syllabus = get_count('syllabus')
         total_reminders = get_count('reminders')
         
+        total_emails_sent = 0
+        try:
+            row = db.execute('SELECT COALESCE(SUM(recipients_count), 0) as total FROM email_logs').fetchone()
+            if isinstance(row, dict):
+                total_emails_sent = row.get('total', 0)
+            else:
+                total_emails_sent = row[0] if row else 0
+        except Exception:
+            pass
+        
         return jsonify({
             'total_users': total_users,
             'total_tasks': total_homework + total_assignments,
             'total_syllabus': total_syllabus,
             'total_reminders': total_reminders,
+            'total_emails_sent': total_emails_sent,
             'reviews': [
                 {'id': 1, 'name': 'Alex M.', 'rating': 5, 'comment': 'Taskora has completely transformed how I manage my classes!'},
                 {'id': 2, 'name': 'Sarah T.', 'rating': 4, 'comment': 'Great study assistant. The countdown feature is fantastic.'},
@@ -336,6 +347,16 @@ def admin_send_bulk_email():
                 fail_count += 1
                 
         server.quit()
+        
+        try:
+            db.execute(
+                'INSERT INTO email_logs (subject, recipients_count) VALUES (?, ?)',
+                (subject, success_count)
+            )
+            db.commit()
+        except Exception:
+            pass
+            
         return jsonify({
             'message': f'Broadcast completed. Success: {success_count}, Failed: {fail_count}'
         }), 200
