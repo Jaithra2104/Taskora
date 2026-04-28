@@ -80,6 +80,16 @@ The Taskora Team
                 fail_count += 1
 
         server.quit()
+        
+        try:
+            db.execute(
+                'INSERT INTO email_logs (subject, recipients_count) VALUES (?, ?)',
+                ("Welcome to Taskora! 📘✨", success_count)
+            )
+            db.commit()
+        except Exception as e:
+            print(f"[DB Error] Failed to log email metrics: {str(e)}")
+            
         print(f"\nBulk emailing completed! Total Success: {success_count}, Failed: {fail_count}")
 
     except Exception as e:
