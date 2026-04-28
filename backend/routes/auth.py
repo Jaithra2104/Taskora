@@ -186,6 +186,80 @@ def get_profile():
         db.close()
 
 
+
+@auth_bp.route('/admin/send-bulk-email', methods=['POST'])
+@jwt_required()
+def admin_send_bulk_email():
+    user_id = get_jwt_identity()
+    db = get_db()
+    try:
+        user = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
+        if not user or user['email'] != 'officialtaskora@gmail.com':
+            return jsonify({'error': 'Unauthorized access.'}), 403
+            
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+            
+        subject = data.get('subject', '').strip()
+        body = data.get('body', '').strip()
+        
+        if not subject or not body:
+            return jsonify({'error': 'Subject and body are required'}), 400
+            
+        email_user = os.environ.get('EMAIL_USER')
+        email_pass = os.environ.get('EMAIL_PASS')
+        
+        if not email_user or not email_pass:
+            return jsonify({'error': 'SMTP credentials are not configured on the server.'}), 500
+            
+        cursor = db.execute('SELECT name, email FROM users')
+        users = []
+        for row in cursor.fetchall():
+            users.append({'name': row['name'], 'email': row['email']})
+            
+        if not users:
+            return jsonify({'message': 'No users found in database.'}), 200
+            
+        import smtplib
+        from email.mime.text import MIMEText
+        
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(email_user, email_pass)
+        
+        success_count = 0
+        fail_count = 0
+        
+        for u in users:
+            if not u['email']:
+                continue
+            
+            # Personalize body if requested
+            user_body = body.replace('{{name}}', u['name'])
+            
+            msg = MIMEText(user_body)
+            msg['Subject'] = subject
+            msg['From'] = email_user
+            msg['To'] = u['email']
+            
+            try:
+                server.send_message(msg)
+                success_count += 1
+            except Exception:
+                fail_count += 1
+                
+        server.quit()
+        return jsonify({
+            'message': f'Broadcast completed. Success: {success_count}, Failed: {fail_count}'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Admin Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+
 # ── GOOGLE OAUTH ──
 
 @auth_bp.route('/google', methods=['GET'])

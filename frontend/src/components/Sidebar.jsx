@@ -23,6 +23,11 @@ export default function Sidebar() {
   const go = (path) => { navigate(path); setOpen(false) }
   const initials = user?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'U'
 
+  const navItems = [...NAV]
+  if (user?.email === 'officialtaskora@gmail.com') {
+    navItems.push({ path: '/admin', label: 'Admin Panel', icon: 'fa-user-shield' })
+  }
+
   return (
     <>
       {/* Mobile header */}
@@ -46,7 +51,7 @@ export default function Sidebar() {
         {/* Nav */}
         <nav className="sidebar-nav">
           <div className="nav-label">Navigation</div>
-          {NAV.map(item => (
+          {navItems.map(item => (
             <button
               key={item.path}
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
