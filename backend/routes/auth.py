@@ -12,6 +12,60 @@ auth_bp = Blueprint('auth', __name__)
 
 otp_store = {}
 
+def send_welcome_email(email, name):
+    """Send a welcome email to a newly registered user."""
+    import os
+    import smtplib
+    from email.mime.text import MIMEText
+    from models import get_db
+    
+    email_user = os.environ.get('EMAIL_USER')
+    email_pass = os.environ.get('EMAIL_PASS')
+    
+    if not email_user or not email_pass:
+        return False
+        
+    subject = "Welcome to Taskora! 📘✨"
+    body = f"""Hi {name},
+
+Thank you for using Taskora! We are thrilled to have you onboard as your smart student companion. 
+
+Taskora is designed to help you track your classes, manage assignments, master your syllabus, and streamline your study routines effortlessly.
+
+If you have any feedback or suggestions to make Taskora better, please let us know.
+
+Keep shining,
+The Taskora Team
+"""
+    try:
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = email_user
+        msg['To'] = email
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(email_user, email_pass)
+        server.send_message(msg)
+        server.quit()
+        
+        db = get_db()
+        try:
+            db.execute(
+                'INSERT INTO email_logs (subject, recipients_count) VALUES (?, ?)',
+                (subject, 1)
+            )
+            db.commit()
+        except Exception:
+            pass
+        finally:
+            db.close()
+            
+        return True
+    except Exception as e:
+        print(f"[Welcome Email] SMTP Error: {str(e)}")
+        return False
+
 @auth_bp.route('/send-otp', methods=['POST'])
 def send_otp():
     """Send an OTP for email verification."""
@@ -113,6 +167,11 @@ def signup():
         # Clear OTP after successful registration
         if email in otp_store:
             del otp_store[email]
+
+        try:
+            send_welcome_email(email, name)
+        except Exception:
+            pass
 
         return jsonify({
             'message': 'Account created successfully',
@@ -469,6 +528,11 @@ def google_callback():
                 )
                 user_id = cursor.lastrowid
                 db.commit()
+                
+                try:
+                    send_welcome_email(email, name)
+                except Exception:
+                    pass
             else:
                 user_id = user['id']
                 
@@ -552,6 +616,11 @@ def github_callback():
                 )
                 user_id = cursor.lastrowid
                 db.commit()
+                
+                try:
+                    send_welcome_email(email, name)
+                except Exception:
+                    pass
             else:
                 user_id = user['id']
                 
