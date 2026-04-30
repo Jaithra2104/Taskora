@@ -327,12 +327,6 @@ def admin_get_stats():
         except Exception:
             pass
         
-        return jsonify({
-            'total_users': total_users,
-            'total_tasks': total_homework + total_assignments,
-            'total_syllabus': total_syllabus,
-            'total_reminders': total_reminders,
-            'total_emails_sent': total_emails_sent,
         reviews = []
         try:
             cursor = db.execute(

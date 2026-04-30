@@ -1,49 +1,82 @@
 import sys
 import os
 import smtplib
+import traceback
 from email.mime.text import MIMEText
 
 # Add the current directory to the path so we can import models and config
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from models import get_db
-from config import Config
+try:
+    from models import get_db
+    from config import Config
+except ImportError:
+    print("[Error] Could not import models or config. Make sure you are running this from the backend directory.")
+    sys.exit(1)
 
 def send_greetings():
+    print(f"\n{'='*50}")
+    print("🚀 TASKORA BULK EMAIL SERVICE")
+    print(f"{'='*50}\n")
+
     email_user = os.environ.get('EMAIL_USER')
     email_pass = os.environ.get('EMAIL_PASS')
 
     if not email_user:
-        email_user = input("Enter your Taskora Gmail address: ").strip()
+        email_user = input("📧 Enter your Taskora Gmail address: ").strip()
     if not email_pass:
-        email_pass = input("Enter your Gmail App Password: ").strip()
+        email_pass = input("🔑 Enter your Gmail App Password: ").strip()
 
     if not email_user or not email_pass:
-        print("[Error] Gmail address and App Password are required.")
+        print("\n❌ [Error] Gmail address and App Password are required.")
+        print("💡 Tip: Use a Google App Password, not your regular password.")
         return
 
-    print("[DB] Connecting to database...")
-    db = get_db()
+    db = None
     try:
+        print("[DB] Connecting to database...")
+        db = get_db()
+        
         # Query users
         cursor = db.execute('SELECT name, email FROM users')
+        rows = cursor.fetchall()
         
         users = []
-        for row in cursor.fetchall():
-            users.append({'name': row['name'], 'email': row['email']})
+        for row in rows:
+            # Handle both sqlite3.Row and dict (for Postgres)
+            name = row['name'] if isinstance(row, dict) or hasattr(row, 'keys') else row[0]
+            email = row['email'] if isinstance(row, dict) or hasattr(row, 'keys') else row[1]
+            users.append({'name': name, 'email': email})
                 
-        print(f"Found {len(users)} registered users.")
+        print(f"✅ Found {len(users)} registered users.")
 
         if not users:
             print("[Info] No users found in the database.")
             return
 
-        print("[SMTP] Connecting to Gmail SMTP server...")
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(email_user, email_pass)
-        
-        print("[Status] Sending emails...")
+        print(f"[SMTP] Connecting to Gmail SMTP server (smtp.gmail.com:587)...")
+        server = None
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587, timeout=15)
+            server.set_debuglevel(0) # Set to 1 for detailed SMTP logs
+            server.starttls()
+            
+            print("[SMTP] Attempting login...")
+            server.login(email_user, email_pass)
+            print("🔓 [SMTP] Login successful!")
+            
+        except smtplib.SMTPAuthenticationError:
+            print("\n❌ [SMTP Error] Authentication failed.")
+            print("   Possible reasons:")
+            print("   1. Incorrect email or App Password.")
+            print("   2. 'Less secure apps' is blocked (Use App Password instead).")
+            print("   3. 2FA is enabled but App Password was not used.")
+            return
+        except Exception as e:
+            print(f"\n❌ [SMTP Error] Connection failed: {str(e)}")
+            return
+
+        print(f"\n[Status] Sending emails to {len(users)} users...")
         success_count = 0
         fail_count = 0
 
@@ -51,7 +84,8 @@ def send_greetings():
             name = user['name']
             email = user['email']
             
-            if not email:
+            if not email or "@" not in email:
+                print(f"⚠️ [Skip] Invalid email for {name}: {email}")
                 continue
 
             subject = "Welcome to Taskora! 📘✨"
@@ -73,29 +107,39 @@ The Taskora Team
 
             try:
                 server.send_message(msg)
-                print(f"[Success] Sent to {name} ({email})")
+                print(f"   ✅ Sent to {name} ({email})")
                 success_count += 1
             except Exception as e:
-                print(f"[Failed] Failed to send to {email}: {str(e)}")
+                print(f"   ❌ Failed to send to {email}: {str(e)}")
                 fail_count += 1
 
+        print("\n[SMTP] Closing connection...")
         server.quit()
         
+        # Log results
         try:
             db.execute(
                 'INSERT INTO email_logs (subject, recipients_count) VALUES (?, ?)',
                 ("Welcome to Taskora! 📘✨", success_count)
             )
             db.commit()
+            print("[DB] Metrics logged successfully.")
         except Exception as e:
-            print(f"[DB Error] Failed to log email metrics: {str(e)}")
+            # Silently handle missing table if init_db wasn't run
+            print(f"[DB Warning] Could not log metrics (Table might be missing): {str(e)}")
             
-        print(f"\nBulk emailing completed! Total Success: {success_count}, Failed: {fail_count}")
+        print(f"\n{'='*50}")
+        print(f"🏁 Bulk emailing completed!")
+        print(f"   - Success: {success_count}")
+        print(f"   - Failed:  {fail_count}")
+        print(f"{'='*50}\n")
 
     except Exception as e:
-        print(f"[Error] An error occurred: {str(e)}")
+        print(f"\n❌ [Critical Error] {str(e)}")
+        traceback.print_exc()
     finally:
-        db.close()
+        if db:
+            db.close()
 
 if __name__ == "__main__":
     send_greetings()
